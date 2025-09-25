@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Support - Home Harmony Premium Festive</title>
+    <link
+      rel="shortcut icon"
+      href="Screenshot 2025-09-14 183553.png"
+      type="image/x-icon"
+    />
+    <style>
+      :root {
+        --maroon: #6a1b1b; /* primary */
+        --maroon-dark: #6a1b1b;
+        --gold: #ffd54f; /* accent */
+        --bg: #fff8e7;
+        --muted: #555;
+        --card-shadow: 0 6px 18px rgba(107, 15, 15, 0.08);
+        --radius: 12px;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, var(--bg), #fff);
+        color: #222;
+      }
+
+      /* Header */
+      header {
+        background: linear-gradient(90deg, var(--maroon), var(--maroon-dark));
+        color: white;
+        padding: 26px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--maroon);
+        font-weight: 800;
+        font-size: 20px;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.4px;
+      }
+      .brand p {
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.95;
+      }
+      nav a {
+        color: rgba(255, 255, 255, 0.95);
+        text-decoration: none;
+        margin-left: 18px;
+        font-weight: 600;
+      }
+
+      /* Main layout */
+      .container {
+        max-width: 1100px;
+        margin: 28px auto;
+        padding: 0 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* Card */
+      .card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+      }
+
+      /* Hero */
+      .hero {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      .hero .left {
+        flex: 1;
+      }
+      .hero h2 {
+        margin: 0 0 8px 0;
+        color: var(--maroon);
+      }
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .search-box {
+        display: flex;
+        margin-top: 16px;
+      }
+      .search-box input {
+        flex: 1;
+        padding: 12px 14px;
+        border: 1px solid #f0e6e6;
+        border-right: 0;
+        border-radius: 10px 0 0 10px;
+      }
+      .search-box button {
+        background: var(--maroon);
+        color: white;
+        border: 0;
+        padding: 12px 16px;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+      }
+
+      /* Quick contacts */
+      .quick {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .quick button {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #f1e8e8;
+        background: linear-gradient(180deg, #fff, #fffaf6);
+        cursor: pointer;
+      }
+      .quick small {
+        display: block;
+        color: var(--muted);
+      }
+
+      /* FAQ */
+      .faq h3 {
+        margin-top: 0;
+        color: var(--maroon);
+      }
+      .accordion {
+        margin-top: 10px;
+      }
+      .acc-item {
+        border-top: 1px solid #f2eaea;
+      }
+      .acc-btn {
+        width: 100%;
+        text-align: left;
+        padding: 14px;
+        background: transparent;
+        border: 0;
+        font-weight: 700;
+        cursor: pointer;
+        color: var(--maroon);
+      }
+      .acc-panel {
+        padding: 0 14px 14px 14px;
+        color: var(--muted);
+        display: none;
+      }
+
+      /* Support sidebar */
+      .sidebar .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #2ecc71;
+        box-shadow: 0 0 8px rgba(46, 204, 113, 0.12);
+      }
+      .contact-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .contact-methods a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        background: linear-gradient(180deg, #fff, #fffaf6);
+        border: 1px solid #f0e6e6;
+        color: var(--maroon);
+      }
+
+      /* Form */
+      form .row {
+        display: flex;
+        gap: 10px;
+      }
+      form label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+      button.primary {
+        background: var(--maroon);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 0;
+        cursor: pointer;
+      }
+
+      /* Footer */
+      footer {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 20px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          order: 2;
+        }
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="logo">HH</div>
+        <div>
+          <h1>Home Harmony</h1>
+          <p>Support — Smart Living Made Simple</p>
+        </div>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#support">Support</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <div class="grid">
+        <!-- Left Column -->
+        <section>
+          <div
+            class="card hero"
+            role="region"
+            aria-labelledby="support-heading"
+          >
+            <div class="left">
+              <h2 id="support-heading">How can we help you today?</h2>
+              <p>
+                Search help articles, raise a ticket, or start a live chat. Our
+                team is here to assist you with rentals, purchases, deliveries,
+                and returns.
+              </p>
+
+              <div class="search-box" role="search">
+                <input id="searchInput" type="text" placeholder="Search help
+                articles, e.g. " + "How to return a product" aria-label="Search
+                help articles">
+                <button id="searchBtn">Search</button>
+              </div>
+
+              <div class="quick">
+                <button onclick="openContact('call')">
+                  <strong>Call Support</strong><small>Mon–Fri, 9am–6pm</small>
+                </button>
+                <button onclick="openContact('chat')">
+                  <strong>Start Chat</strong><small>Live chat available</small>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card faq" style="margin-top: 18px">
+            <h3>Frequently Asked Questions</h3>
+
+            <div class="accordion" id="faqList">
+              <div class="acc-item">
+                <button class="acc-btn">
+                  How do I rent furniture?
+                  <span style="float: right; color: var(--muted)">+</span>
+                </button>
+                <div class="acc-panel">
+                  Select <em>Rent</em> on our homepage, choose items or a
+                  package, pick duration and delivery slot. We’ll deliver and
+                  install it for you.
+                </div>
+              </div>
+
+              <div class="acc-item">
+                <button class="acc-btn">
+                  Can I return items early?
+                  <span style="float: right; color: var(--muted)">+</span>
+                </button>
+                <div class="acc-panel">
+                  Yes. Login to your account, go to Orders &gt; Manage, and
+                  request an early return. Partial refunds apply based on
+                  remaining tenure.
+                </div>
+              </div>
+
+              <div class="acc-item">
+                <button class="acc-btn">How do I sell my used item?</button>
+                <div class="acc-panel">
+                  Go to Sell &gt; List Your Item. Add photos, a description, and
+                  your price. We verify quality and help you find buyers.
+                </div>
+              </div>
+
+              <div class="acc-item">
+                <button class="acc-btn">
+                  What is the warranty on pre-owned items?
+                </button>
+                <div class="acc-panel">
+                  We provide a 30-day limited warranty on all pre-owned items
+                  unless otherwise specified on the product page.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 18px">
+            <h3>Need more help? Raise a ticket</h3>
+            <form id="supportForm" onsubmit="return submitTicket(event)">
+              <div class="row">
+                <div style="flex: 1">
+                  <label for="name">Name</label>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    placeholder="Your name"
+                  />
+                </div>
+                <div style="flex: 1">
+                  <label for="email">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+              <div style="margin-top: 10px">
+                <label for="subject">Subject</label>
+                <input
+                  id="subject"
+                  type="text"
+                  required
+                  placeholder="Issue subject"
+                />
+              </div>
+              <div style="margin-top: 10px">
+                <label for="message">Message</label>
+                <textarea
+                  id="message"
+                  rows="5"
+                  placeholder="Describe your issue"
+                  required
+                ></textarea>
+              </div>
+              <div
+                style="
+                  margin-top: 12px;
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                "
+              >
+                <button class="primary" type="submit">Submit Ticket</button>
+                <small id="formMsg" style="color: var(--muted)"
+                  >Our team replies within 24–48 hours.</small
+                >
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Right Column / Sidebar -->
+        <aside class="sidebar">
+          <div class="card">
+            <div class="status">
+              <div style="flex: 1">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <strong>System Status</strong
+                  ><span style="font-size: 13px; color: var(--muted)"
+                    >All systems operational</span
+                  >
+                </div>
+                <div
+                  style="font-size: 13px; color: var(--muted); margin-top: 6px"
+                >
+                  Order processing, payments, and deliveries are functioning
+                  normally.
+                </div>
+              </div>
+              <div class="status-dot" aria-hidden="true"></div>
+            </div>
+
+            <div style="height: 1px; background: #f6eaea; margin: 12px 0"></div>
+
+            <div class="contact-methods">
+              <a href="#contact" onclick="openContact('call')">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.6 10.8a15.05 15.05 0 006.6 6.6l2.2-2.2a1 1 0 01.9-.3c1 .2 2 .3 3 .3a1 1 0 011 1V20a1 1 0 01-1 1C9 21 3 15 3 6a1 1 0 011-1h2.5a1 1 0 011 1c0 1 .1 2 .3 3a1 1 0 01-.3.9L6.6 10.8z"
+                    fill="var(--maroon)"
+                  />
+                </svg>
+                Call us: +91 98765 43210
+              </a>
+
+              <a href="#chat" onclick="openContact('chat')">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                    fill="var(--maroon)"
+                  />
+                </svg>
+                Live chat
+              </a>
+
+              <a href="#email" onclick="copySupportEmail(event)">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 8l9 6 9-6v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"
+                    fill="var(--maroon)"
+                  />
+                </svg>
+                Email: support@homeharmony.example
+              </a>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 16px">
+            <h4 style="margin: 0 0 8px 0; color: var(--maroon)">
+              Helpful Articles
+            </h4>
+            <ul style="margin: 0; padding-left: 18px; color: var(--muted)">
+              <li><a href="#">How to schedule delivery</a></li>
+              <li><a href="#">Manage your subscription</a></li>
+              <li><a href="#">Damage & refund policy</a></li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top: 16px; text-align: center">
+            <strong style="color: var(--maroon)">Share feedback</strong>
+            <p style="color: var(--muted); font-size: 13px">
+              Help us improve — scan the QR or click below
+            </p>
+            <a
+              id="feedbackLink"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSfzZy8rfF0h2qiDIDdABT8TYB26I8YkwFZ0bV7rCNrQUQOjLw/viewform?usp=header"
+              class="primary"
+              style="
+                display: inline-block;
+                text-decoration: none;
+                padding: 8px 12px;
+                border-radius: 8px;
+                background: var(--gold);
+                color: var(--maroon);
+                font-weight: 700;
+                margin-top: 8px;
+              "
+              >Open Feedback Form</a
+            >
+            <img src="WhatsApp Image 2025-09-12 at 15.08.46_fc4e2493.jpg" /
+            height="200px">
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer>
+      <div>© Home Harmony • Smart Living Made Simple</div>
+      <div>
+        Need help?
+        <a href="#contact" onclick="openContact('email')"
+          >support@homeharmony.example</a
+        >
+      </div>
+    </footer>
+
+    <script>
+      // Accordion behavior
+      document.querySelectorAll(".acc-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const panel = btn.nextElementSibling;
+          const open = panel.style.display === "block";
+          // close all
+          document
+            .querySelectorAll(".acc-panel")
+            .forEach((p) => (p.style.display = "none"));
+          if (!open) panel.style.display = "block";
+        });
+      });
+
+      // Search placeholder behavior
+      document.getElementById("searchBtn").addEventListener("click", () => {
+        const q = document.getElementById("searchInput").value.trim();
+        if (!q) {
+          alert(
+            'Try searching for: "return a product", "cancel order", or "sell item"'
+          );
+          return;
+        }
+        // mock search result
+        alert('Searching help articles for: "' + q + '" — (demo)');
+      });
+
+      // Copy email
+      function copySupportEmail(e) {
+        e.preventDefault();
+        navigator.clipboard &&
+          navigator.clipboard
+            .writeText("support@homeharmony.example")
+            .then(() => alert("Support email copied to clipboard"))
+            .catch(() =>
+              prompt("Copy this email", "support@homeharmony.example")
+            );
+      }
+
+      // Contact actions
+      function openContact(type) {
+        if (type === "chat") {
+          // Open demo chat bubble
+          openChatBubble();
+        } else if (type === "call") {
+          alert("Call us at +91 98765 43210 (demo)");
+        } else if (type === "email") {
+          location.href = "mailto:support@homeharmony.example";
+        }
+      }
+
+      // Feedback link (replace with real URL)
+      document.getElementById("feedbackLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        // replace below with your Google Form link
+        const formUrl = "https://forms.gle/YOUR_GOOGLE_FORM_LINK";
+        window.open(formUrl, "_blank");
+      });
+
+      // Mock ticket submission
+      function submitTicket(e) {
+        e.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const subject = document.getElementById("subject").value.trim();
+        const message = document.getElementById("message").value.trim();
+        if (!name || !email || !subject || !message) {
+          document.getElementById("formMsg").textContent =
+            "Please fill all fields.";
+          return false;
+        }
+        // demo: show ticket ID
+        const ticketId = "HH" + Math.floor(Math.random() * 90000 + 10000);
+        alert(
+          "Thanks, " +
+            name +
+            "! Your ticket has been submitted. Ticket ID: " +
+            ticketId
+        );
+        document.getElementById("supportForm").reset();
+        return false;
+      }
+
+      // Simple chat bubble (demo)
+      function openChatBubble() {
+        if (document.getElementById("chatBubble")) return;
+        const bubble = document.createElement("div");
+        bubble.id = "chatBubble";
+        bubble.style.position = "fixed";
+        bubble.style.right = "20px";
+        bubble.style.bottom = "20px";
+        bubble.style.width = "320px";
+        bubble.style.maxWidth = "calc(100% - 40px)";
+        bubble.style.background = "white";
+        bubble.style.borderRadius = "12px";
+        bubble.style.boxShadow = "0 10px 30px rgba(0,0,0,0.12)";
+        bubble.innerHTML = `
+        <div style="padding:10px;border-bottom:1px solid #f3eaea;display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--maroon)">Home Harmony Support</strong>
+          <button onclick="closeChatBubble()" style="background:none;border:0;font-size:18px;cursor:pointer">×</button>
+        </div>
+        <div style="padding:12px;max-height:240px;overflow:auto;color:var(--muted);font-size:13px">Hi! 👋 How can we help you today? Try: "Where is my order?"</div>
+        <div style="padding:10px;border-top:1px solid #f3eaea;display:flex;gap:8px">
+          <input id="chatInput" placeholder="Type a message" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+          <button onclick="sendChatMsg()" style="background:var(--maroon);color:white;border:0;padding:8px 10px;border-radius:8px">Send</button>
+        </div>
+      `;
+        document.body.appendChild(bubble);
+      }
+      function closeChatBubble() {
+        const b = document.getElementById("chatBubble");
+        if (b) b.remove();
+      }
+      function sendChatMsg() {
+        const input = document.getElementById("chatInput");
+        if (!input || !input.value.trim()) return;
+        alert('Chat is a demo. Your message: "' + input.value.trim() + '"');
+        input.value = "";
+      }
+    </script>
+  </body>
+</html>
