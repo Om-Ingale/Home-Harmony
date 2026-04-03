@@ -13,20 +13,20 @@
   <!-- Stat Cards -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
     <% const cards = [
-      { label: 'Total Users',    val: stats.userCount,    icon: 'users',      color: 'bg-blue-50   text-blue-600'   },
-      { label: 'Total Listings', val: stats.productCount, icon: 'package',    color: 'bg-amber-50  text-amber-600'  },
-      { label: 'Total Reviews',  val: stats.reviewCount,  icon: 'star',       color: 'bg-violet-50 text-violet-600' },
-      { label: 'Available',      val: stats.availableCount,icon:'check-circle',color:'bg-emerald-50 text-emerald-600'},
+      { label: 'Total Users',    val: stats.userCount,    icon: 'users',      color: 'bg-blue-50 border-blue-200 text-blue-600'   },
+      { label: 'Total Listings', val: stats.productCount, icon: 'package',    color: 'bg-amber-50 border-amber-200 text-amber-600'  },
+      { label: 'Total Reviews',  val: stats.reviewCount,  icon: 'star',       color: 'bg-violet-50 border-violet-200 text-violet-600' },
+      { label: 'Available',      val: stats.availableCount,icon:'check-circle',color:'bg-emerald-50 border-emerald-200 text-emerald-600'},
     ]; %>
     <% cards.forEach(c => { %>
-      <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm font-medium text-stone-500"><%= c.label %></span>
-          <span class="<%= c.color %> p-2 rounded-xl">
-            <i data-lucide="<%= c.icon %>" class="w-4 h-4"></i>
+      <div class="<%= c.color %> rounded-2xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow group">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-sm font-semibold text-stone-700"><%= c.label %></span>
+          <span class="<%= c.color.split(' ')[0] %> p-3 rounded-xl">
+            <i data-lucide="<%= c.icon %>" class="w-5 h-5"></i>
           </span>
         </div>
-        <p class="font-display text-3xl font-bold text-stone-900"><%= c.val %></p>
+        <p class="font-display text-4xl font-bold text-stone-900"><%= c.val %></p>
       </div>
     <% }) %>
   </div>
@@ -49,15 +49,15 @@
 
   <!-- Quick Nav -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-    <a href="/admin/users" class="flex items-center gap-4 bg-white border border-stone-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+    <a href="/admin/users" class="flex items-center gap-4 bg-blue-50 border border-blue-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
       <div class="bg-blue-100 p-3 rounded-xl"><i data-lucide="users" class="w-5 h-5 text-blue-600"></i></div>
       <div><p class="font-semibold text-stone-800">Manage Users</p><p class="text-xs text-stone-400">View, promote, delete</p></div>
     </a>
-    <a href="/admin/products" class="flex items-center gap-4 bg-white border border-stone-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+    <a href="/admin/products" class="flex items-center gap-4 bg-amber-50 border border-amber-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
       <div class="bg-amber-100 p-3 rounded-xl"><i data-lucide="package" class="w-5 h-5 text-amber-600"></i></div>
       <div><p class="font-semibold text-stone-800">Manage Listings</p><p class="text-xs text-stone-400">View, remove listings</p></div>
     </a>
-    <a href="/admin/reviews" class="flex items-center gap-4 bg-white border border-stone-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+    <a href="/admin/reviews" class="flex items-center gap-4 bg-violet-50 border border-violet-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
       <div class="bg-violet-100 p-3 rounded-xl"><i data-lucide="star" class="w-5 h-5 text-violet-600"></i></div>
       <div><p class="font-semibold text-stone-800">Manage Reviews</p><p class="text-xs text-stone-400">Moderate reviews</p></div>
     </a>

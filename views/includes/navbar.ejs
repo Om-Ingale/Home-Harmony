@@ -4,20 +4,20 @@
 
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2 group">
-        <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center shadow-sm group-hover:bg-brand-600 transition-colors">
-          <i data-lucide="home" class="w-4 h-4 text-white"></i>
+        <div class="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center shadow-md group-hover:bg-brand-600 group-hover:shadow-lg transition-all">
+          <i data-lucide="home" class="w-5 h-5 text-white"></i>
         </div>
-        <span class="font-display font-700 text-xl text-stone-900 tracking-tight">
+        <span class="font-display font-700 text-2xl text-stone-900 tracking-tight">
           Home<span class="text-brand-500">Harmony</span>
         </span>
       </a>
 
       <!-- Desktop Nav -->
       <div class="hidden md:flex items-center gap-6">
-        <a href="/products" class="text-sm font-medium text-stone-600 hover:text-brand-500 transition-colors">Browse</a>
-        <a href="/products?type=rent" class="text-sm font-medium text-stone-600 hover:text-brand-500 transition-colors">Rent</a>
-        <a href="/products?type=buy" class="text-sm font-medium text-stone-600 hover:text-brand-500 transition-colors">Buy</a>
-        <a href="/products?type=sell" class="text-sm font-medium text-stone-600 hover:text-brand-500 transition-colors">Sell</a>
+        <a href="/products" class="text-base font-medium text-stone-600 hover:text-brand-500 hover:bg-stone-50 px-3 py-2 rounded-lg transition-all">Browse</a>
+        <a href="/products?type=rent" class="text-base font-medium text-stone-600 hover:text-brand-500 hover:bg-stone-50 px-3 py-2 rounded-lg transition-all">Rent</a>
+        <a href="/products?type=buy" class="text-base font-medium text-stone-600 hover:text-brand-500 hover:bg-stone-50 px-3 py-2 rounded-lg transition-all">Buy</a>
+        <a href="/products?type=sell" class="text-base font-medium text-stone-600 hover:text-brand-500 hover:bg-stone-50 px-3 py-2 rounded-lg transition-all">Sell</a>
       </div>
 
       <!-- Auth Buttons -->
@@ -28,7 +28,14 @@
             <i data-lucide="plus" class="w-4 h-4"></i> List Item
           </a>
 
-          <!-- Avatar dropdown -->
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <a href="/admin"
+               class="hidden sm:flex items-center gap-1.5 text-sm font-medium text-stone-700 hover:text-brand-600 transition-colors px-3 py-2">
+               <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
+            </a>
+          <% } %>
+
+          <!-- User Avatar -->
           <div class="relative group">
             <button class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors">
               <img src="<%= currentUser.avatar.url %>" alt="<%= currentUser.username %>"
@@ -36,16 +43,8 @@
               <span class="text-sm font-medium text-stone-700 hidden sm:block"><%= currentUser.username %></span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-400"></i>
             </button>
-            <!-- Add inside the avatar dropdown, before logout -->
-            <% if (currentUser && currentUser.role === 'admin') { %>
-              <a href="/admin"
-                  class="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
-                  <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
-              </a>
-           <div class="border-t border-stone-100 my-1"></div>
-            <% } %>
             <!-- Dropdown -->
-            <div class="absolute right-0 mt-1 w-44 bg-white border border-stone-100 rounded-xl shadow-lg py-1.5
+            <div class="absolute right-0 top-full mt-2 w-44 bg-white border border-stone-100 rounded-xl shadow-lg py-1.5
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
               <form action="/auth/logout" method="POST">
                 <button type="submit"

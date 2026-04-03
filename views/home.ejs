@@ -1,12 +1,12 @@
 <%- layout('boilerplate') %>
 
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 text-white">
+<section class="relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 text-white -mt-16">
   <!-- Background pattern -->
   <div class="absolute inset-0 opacity-5"
        style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;">
   </div>
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 md:py-40">
     <div class="max-w-2xl">
       <span class="inline-flex items-center gap-1.5 bg-brand-500/20 border border-brand-500/30 text-brand-300 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
         <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> India's Home Marketplace
@@ -30,15 +30,47 @@
       </div>
     </div>
   </div>
+
+  <!-- Wave Animation -->
+  <div class="absolute bottom-0 left-0 right-0 h-32 overflow-hidden">
+    <svg class="w-full h-full" viewBox="0 0 1200 120" preserveAspectRatio="none" style="animation: wave 8s linear infinite; min-width: 200%;">
+      <path d="M0,50 Q300,0 600,50 T1200,50 T1800,50 L1800,120 L0,120 Z" fill="rgba(220, 116, 32, 0.12)"></path>
+    </svg>
+    <svg class="w-full h-full absolute bottom-0" viewBox="0 0 1200 120" preserveAspectRatio="none" style="animation: wave 6s linear infinite reverse; min-width: 200%; margin-top: -15px;">
+      <path d="M0,65 Q300,15 600,65 T1200,65 T1800,65 L1800,120 L0,120 Z" fill="rgba(220, 116, 32, 0.08)"></path>
+    </svg>
+  </div>
+
+  <style>
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-600px); }
+      100% { transform: translateX(-1200px); }
+    }
+  </style>
 </section>
 
 <!-- Stats Strip -->
-<section class="bg-white border-b border-stone-100">
-  <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-    <div><p class="text-2xl font-display font-bold text-stone-900">10,000+</p><p class="text-sm text-stone-500">Listings</p></div>
-    <div><p class="text-2xl font-display font-bold text-stone-900">50+</p><p class="text-sm text-stone-500">Cities</p></div>
-    <div><p class="text-2xl font-display font-bold text-stone-900">4.8★</p><p class="text-sm text-stone-500">Avg Rating</p></div>
-    <div><p class="text-2xl font-display font-bold text-stone-900">₹0</p><p class="text-sm text-stone-500">Commission</p></div>
+<section class="bg-stone-50 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="group flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 bg-emerald-50 border-emerald-100 hover:shadow-md transition-all hover:-translate-y-1">
+        <p class="text-3xl font-display font-bold text-emerald-600">10,000+</p>
+        <p class="font-medium text-stone-700 text-sm">Listings</p>
+      </div>
+      <div class="group flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 bg-blue-50 border-blue-100 hover:shadow-md transition-all hover:-translate-y-1">
+        <p class="text-3xl font-display font-bold text-blue-600">50+</p>
+        <p class="font-medium text-stone-700 text-sm">Cities</p>
+      </div>
+      <div class="group flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 bg-orange-50 border-orange-100 hover:shadow-md transition-all hover:-translate-y-1">
+        <p class="text-3xl font-display font-bold text-orange-600">4.8★</p>
+        <p class="font-medium text-stone-700 text-sm">Avg Rating</p>
+      </div>
+      <div class="group flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 bg-purple-50 border-purple-100 hover:shadow-md transition-all hover:-translate-y-1">
+        <p class="text-3xl font-display font-bold text-purple-600">₹0</p>
+        <p class="font-medium text-stone-700 text-sm">Commission</p>
+      </div>
+    </div>
   </div>
 </section>
 
