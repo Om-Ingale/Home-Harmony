@@ -1,20 +1,15 @@
 // routes/reviews.js
 
-const express    = require("express");
-const router     = express.Router({ mergeParams: true }); // access :id from parent
+const express = require("express");
+const router = express.Router({ mergeParams: true });
 const catchAsync = require("../utils/catchAsync");
 const { isLoggedIn, isReviewAuthor } = require("../middleware");
-const reviewController               = require("../controllers/reviewController");
+const reviewController = require("../controllers/reviewController");
 
-// ── Create review ─────────────────────────────
-router.post("/reviews", isLoggedIn, catchAsync(reviewController.createReview));
+// POST /products/:id/reviews
+router.post("/:id/reviews", isLoggedIn, catchAsync(reviewController.createReview));
 
-// ── Delete review ─────────────────────────────
-router.delete(
-  "/reviews/:reviewId",
-  isLoggedIn,
-  isReviewAuthor,
-  catchAsync(reviewController.deleteReview)
-);
+// DELETE /products/:id/reviews/:reviewId
+router.delete("/:id/reviews/:reviewId", isLoggedIn, isReviewAuthor, catchAsync(reviewController.deleteReview));
 
-module.exports = router;    
+module.exports = router;

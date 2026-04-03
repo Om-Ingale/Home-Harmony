@@ -1,28 +1,34 @@
-// routes/products.js
+// routes/products.js  (with Multer upload middleware)
 
 const express    = require("express");
 const router     = express.Router();
 const catchAsync = require("../utils/catchAsync");
 const { isLoggedIn, isOwner } = require("../middleware");
+const { upload }              = require("../utils/cloudinary");
 const productController       = require("../controllers/productController");
 
-// ── Index + Create ────────────────────────────
 router
   .route("/")
   .get(catchAsync(productController.index))
-  .post(isLoggedIn, catchAsync(productController.createProduct));
+  .post(
+    isLoggedIn,
+    upload.array("product[images]", 6),     // up to 6 images
+    catchAsync(productController.createProduct)
+  );
 
-// ── New listing form ──────────────────────────
 router.get("/new", isLoggedIn, productController.renderNewForm);
 
-// ── Show + Update + Delete ────────────────────
 router
   .route("/:id")
   .get(catchAsync(productController.showProduct))
-  .put(isLoggedIn, isOwner, catchAsync(productController.updateProduct))
+  .put(
+    isLoggedIn,
+    isOwner,
+    upload.array("product[images]", 6),
+    catchAsync(productController.updateProduct)
+  )
   .delete(isLoggedIn, isOwner, catchAsync(productController.deleteProduct));
 
-// ── Edit form ─────────────────────────────────
 router.get("/:id/edit", isLoggedIn, isOwner, catchAsync(productController.renderEditForm));
 
 module.exports = router;

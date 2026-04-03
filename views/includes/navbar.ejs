@@ -36,6 +36,14 @@
               <span class="text-sm font-medium text-stone-700 hidden sm:block"><%= currentUser.username %></span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-400"></i>
             </button>
+            <!-- Add inside the avatar dropdown, before logout -->
+            <% if (currentUser && currentUser.role === 'admin') { %>
+              <a href="/admin"
+                  class="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
+                  <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
+              </a>
+           <div class="border-t border-stone-100 my-1"></div>
+            <% } %>
             <!-- Dropdown -->
             <div class="absolute right-0 mt-1 w-44 bg-white border border-stone-100 rounded-xl shadow-lg py-1.5
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">

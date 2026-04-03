@@ -6,25 +6,27 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
-const express        = require("express");
-const mongoose       = require("mongoose");
-const path           = require("path");
-const ejsMate        = require("ejs-mate");
-const session        = require("express-session");
-const MongoStore     = require("connect-mongo");
-const flash          = require("connect-flash");
-const passport       = require("passport");
-const LocalStrategy  = require("passport-local");
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+const ejsMate = require("ejs-mate");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
 const methodOverride = require("method-override");
 
-const User              = require("./models/User");
-const ExpressError      = require("./utils/ExpressError");
+const User = require("./models/User");
+const ExpressError = require("./utils/ExpressError");
 
-const authRoutes        = require("./routes/auth");
-const productRoutes     = require("./routes/products");
-const reviewRoutes      = require("./routes/reviews");
+const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/products");
+const reviewRoutes = require("./routes/reviews");
+const paymentRoutes = require("./routes/payment");
+const adminRoutes = require("./routes/admin");
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/home-harmony";
 
@@ -59,7 +61,7 @@ const sessionConfig = {
     httpOnly: true,                      // prevent XSS access to cookie
     // secure: true,                     // uncomment in production (HTTPS only)
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,   // 1 week
-    maxAge:  1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   },
 };
 
@@ -75,9 +77,9 @@ passport.deserializeUser(User.deserializeUser());
 
 // ─── Global Template Variables ────────────────
 app.use((req, res, next) => {
-  res.locals.currentUser    = req.user;
-  res.locals.success        = req.flash("success");
-  res.locals.error          = req.flash("error");
+  res.locals.currentUser = req.user;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
   next();
 });
 
@@ -86,9 +88,11 @@ app.get("/", (req, res) => {
   res.render("home", { title: "Home Harmony — Rent, Buy & Sell Furniture" });
 });
 
-app.use("/auth",     authRoutes);
+app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
-app.use("/products", reviewRoutes);     // /products/:id/reviews
+app.use("/products", reviewRoutes); // /products/:id/reviews
+app.use("/payment", paymentRoutes);
+app.use("/admin", adminRoutes);
 
 // ─── 404 Handler ─────────────────────────────
 app.all("*", (req, res, next) => {
@@ -105,3 +109,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Home Harmony running at http://localhost:${PORT}`);
 });
+

@@ -1,0 +1,55 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex items-center gap-4 mb-8">
+    <a href="/admin" class="text-stone-400 hover:text-brand-500 transition-colors">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </a>
+    <h1 class="font-display text-3xl font-bold text-stone-900">Manage Reviews</h1>
+    <span class="ml-auto text-sm text-stone-500"><%= reviews.length %> reviews</span>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-stone-50 border-b border-stone-100">
+        <tr>
+          <th class="text-left px-6 py-3.5 font-medium text-stone-500">Review</th>
+          <th class="text-left px-6 py-3.5 font-medium text-stone-500 hidden md:table-cell">Author</th>
+          <th class="text-left px-6 py-3.5 font-medium text-stone-500 hidden md:table-cell">Listing</th>
+          <th class="text-left px-6 py-3.5 font-medium text-stone-500">Rating</th>
+          <th class="text-right px-6 py-3.5 font-medium text-stone-500">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-50">
+        <% reviews.forEach(r => { %>
+          <tr class="hover:bg-stone-50 transition-colors">
+            <td class="px-6 py-4 max-w-[220px]">
+              <p class="text-stone-700 truncate"><%= r.comment %></p>
+              <p class="text-xs text-stone-400 mt-0.5"><%= new Date(r.createdAt).toLocaleDateString('en-IN') %></p>
+            </td>
+            <td class="px-6 py-4 text-stone-500 hidden md:table-cell"><%= r.author?.username || 'Deleted' %></td>
+            <td class="px-6 py-4 text-stone-500 hidden md:table-cell truncate max-w-[160px]"><%= r.product?.title || 'Deleted' %></td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-0.5">
+                <% for(let i=1;i<=5;i++) { %>
+                  <i data-lucide="star" class="w-3.5 h-3.5 <%= i<=r.rating ? 'text-amber-400 fill-amber-400' : 'text-stone-200' %>"></i>
+                <% } %>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex justify-end">
+                <form action="/admin/reviews/<%= r._id %>?_method=DELETE" method="POST"
+                      onsubmit="return confirm('Delete this review?')">
+                  <button type="submit"
+                          class="text-xs px-3 py-1.5 bg-red-50 border border-red-200 text-red-600 rounded-lg hover:bg-red-100 transition-colors">
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
