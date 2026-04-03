@@ -1,0 +1,46 @@
+<footer class="bg-stone-900 text-stone-400 mt-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+
+      <!-- Brand -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+            <i data-lucide="home" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="font-display text-xl text-white font-semibold">
+            Home<span class="text-brand-400">Harmony</span>
+          </span>
+        </div>
+        <p class="text-sm leading-relaxed text-stone-500 max-w-xs">
+          Your trusted marketplace to rent, buy, and sell furniture and home appliances — making every space feel like home.
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-3">Explore</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/products" class="hover:text-brand-400 transition-colors">All Listings</a></li>
+          <li><a href="/products?type=rent" class="hover:text-brand-400 transition-colors">Rent Furniture</a></li>
+          <li><a href="/products?type=buy" class="hover:text-brand-400 transition-colors">Buy Appliances</a></li>
+          <li><a href="/products?category=furniture" class="hover:text-brand-400 transition-colors">Furniture</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-3">Account</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/auth/register" class="hover:text-brand-400 transition-colors">Register</a></li>
+          <li><a href="/auth/login" class="hover:text-brand-400 transition-colors">Sign In</a></li>
+          <li><a href="/products/new" class="hover:text-brand-400 transition-colors">List an Item</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-stone-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-stone-600">&copy; <%= new Date().getFullYear() %> HomeHarmony. All rights reserved.</p>
+      <p class="text-xs text-stone-600">Built with ❤️ for better living spaces</p>
+    </div>
+  </div>
+</footer>

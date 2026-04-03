@@ -1,0 +1,96 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+  <div class="mb-8">
+    <h1 class="font-display text-3xl font-bold text-stone-900">Edit Listing</h1>
+    <p class="text-stone-500 mt-1">Update the details for "<%= product.title %>"</p>
+  </div>
+
+  <form action="/products/<%= product._id %>?_method=PUT" method="POST"
+        class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 space-y-6">
+
+    <div>
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="title">Title</label>
+      <input type="text" name="product[title]" id="title" required maxlength="100"
+             value="<%= product.title %>"
+             class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="description">Description</label>
+      <textarea name="product[description]" id="description" rows="4" required maxlength="2000"
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none"><%= product.description %></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="category">Category</label>
+        <select name="product[category]" id="category" required
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+          <% ['furniture','appliance','decor','electronics','other'].forEach(c => { %>
+            <option value="<%= c %>" <%= product.category === c ? 'selected' : '' %> class="capitalize"><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="type">Listing Type</label>
+        <select name="product[type]" id="type" required
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+          <% ['rent','buy','sell'].forEach(t => { %>
+            <option value="<%= t %>" <%= product.type === t ? 'selected' : '' %> class="capitalize"><%= t %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="price">Price (₹)</label>
+        <input type="number" name="product[price]" id="price" required min="0"
+               value="<%= product.price %>"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="rentPerMonth">Rent/Month (₹)</label>
+        <input type="number" name="product[rentPerMonth]" id="rentPerMonth" min="0"
+               value="<%= product.rentPerMonth || '' %>"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="city">City</label>
+        <input type="text" name="product[city]" id="city" required value="<%= product.city %>"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="location">Area / Locality</label>
+        <input type="text" name="product[location]" id="location" value="<%= product.location || '' %>"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="status">Status</label>
+      <select name="product[status]" id="status"
+              class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+        <% ['available','rented','sold'].forEach(s => { %>
+          <option value="<%= s %>" <%= product.status === s ? 'selected' : '' %> class="capitalize"><%= s %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="pt-2 flex gap-3">
+      <button type="submit"
+              class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
+        Save Changes
+      </button>
+      <a href="/products/<%= product._id %>"
+         class="px-6 py-3 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-50 transition-colors text-sm font-medium flex items-center">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>

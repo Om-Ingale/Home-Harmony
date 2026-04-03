@@ -1,0 +1,99 @@
+<%- layout('boilerplate') %>
+
+<!-- Hero Section -->
+<section class="relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 text-white">
+  <!-- Background pattern -->
+  <div class="absolute inset-0 opacity-5"
+       style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;">
+  </div>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+    <div class="max-w-2xl">
+      <span class="inline-flex items-center gap-1.5 bg-brand-500/20 border border-brand-500/30 text-brand-300 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> India's Home Marketplace
+      </span>
+      <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+        Furnish Your<br />
+        <span class="text-brand-400">Dream Space</span>
+      </h1>
+      <p class="text-stone-300 text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
+        Rent, buy, or sell furniture and home appliances — premium quality, flexible plans, delivered to your door.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="/products"
+           class="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-400 text-white font-semibold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-brand-900/40 hover:shadow-xl hover:-translate-y-0.5">
+          <i data-lucide="search" class="w-4 h-4"></i> Browse Listings
+        </a>
+        <a href="/products/new"
+           class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-all">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> List Your Item
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="bg-white border-b border-stone-100">
+  <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div><p class="text-2xl font-display font-bold text-stone-900">10,000+</p><p class="text-sm text-stone-500">Listings</p></div>
+    <div><p class="text-2xl font-display font-bold text-stone-900">50+</p><p class="text-sm text-stone-500">Cities</p></div>
+    <div><p class="text-2xl font-display font-bold text-stone-900">4.8★</p><p class="text-sm text-stone-500">Avg Rating</p></div>
+    <div><p class="text-2xl font-display font-bold text-stone-900">₹0</p><p class="text-sm text-stone-500">Commission</p></div>
+  </div>
+</section>
+
+<!-- Category Cards -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <h2 class="font-display text-3xl font-bold text-stone-900 mb-2">Shop by Category</h2>
+  <p class="text-stone-500 mb-8">Everything you need for a beautiful home</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <% const categories = [
+      { label: 'Furniture',    icon: 'armchair',    color: 'bg-amber-50   border-amber-100',  q: 'furniture'  },
+      { label: 'Appliances',   icon: 'tv-2',        color: 'bg-blue-50    border-blue-100',   q: 'appliance'  },
+      { label: 'Decor',        icon: 'flower-2',    color: 'bg-rose-50    border-rose-100',   q: 'decor'      },
+      { label: 'Electronics',  icon: 'cpu',         color: 'bg-violet-50  border-violet-100', q: 'electronics'},
+    ]; %>
+    <% categories.forEach(cat => { %>
+      <a href="/products?category=<%= cat.q %>"
+         class="group flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 <%= cat.color %> hover:shadow-md transition-all hover:-translate-y-1">
+        <i data-lucide="<%= cat.icon %>" class="w-8 h-8 text-stone-600 group-hover:text-brand-500 transition-colors"></i>
+        <span class="font-medium text-stone-700 text-sm"><%= cat.label %></span>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="bg-stone-100 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="font-display text-3xl font-bold text-stone-900 mb-2 text-center">How It Works</h2>
+    <p class="text-stone-500 text-center mb-12">Simple steps to furnish your home</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% const steps = [
+        { num: '01', icon: 'search',       title: 'Browse Listings',  desc: 'Explore thousands of furniture and appliance listings across India.' },
+        { num: '02', icon: 'message-circle', title: 'Connect & Agree',  desc: 'Reach out to sellers or owners and agree on terms directly.' },
+        { num: '03', icon: 'truck',         title: 'Delivered Home',   desc: 'Get your items delivered and set up at your convenience.' },
+      ]; %>
+      <% steps.forEach(step => { %>
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+          <span class="font-display text-5xl font-bold text-brand-100"><%= step.num %></span>
+          <i data-lucide="<%= step.icon %>" class="w-6 h-6 text-brand-500 mt-2 mb-3 block"></i>
+          <h3 class="font-semibold text-stone-900 mb-2"><%= step.title %></h3>
+          <p class="text-stone-500 text-sm leading-relaxed"><%= step.desc %></p>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="bg-gradient-to-r from-brand-500 to-brand-700 rounded-3xl p-10 md:p-14 text-white text-center shadow-xl">
+    <h2 class="font-display text-4xl font-bold mb-3">Have Items to Sell or Rent Out?</h2>
+    <p class="text-brand-100 text-lg mb-8">List your furniture or appliances for free and reach thousands of buyers near you.</p>
+    <a href="/products/new"
+       class="inline-flex items-center gap-2 bg-white text-brand-600 font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-50 transition-colors shadow-lg">
+      <i data-lucide="upload-cloud" class="w-5 h-5"></i> Create a Listing — It's Free
+    </a>
+  </div>
+</section>

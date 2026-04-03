@@ -1,0 +1,139 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header + Search -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-display text-3xl font-bold text-stone-900">Browse Listings</h1>
+      <p class="text-stone-500 mt-1"><%= products.length %> item<%= products.length !== 1 ? 's' : '' %> found</p>
+    </div>
+    <form action="/products" method="GET" class="flex gap-2">
+      <input type="text" name="search" value="<%= filters.search || '' %>"
+             placeholder="Search listings..."
+             class="border border-stone-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 w-56 bg-white" />
+      <button type="submit"
+              class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+        <i data-lucide="search" class="w-4 h-4"></i>
+      </button>
+    </form>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-8">
+
+    <!-- Sidebar Filters -->
+    <aside class="lg:w-56 shrink-0">
+      <form action="/products" method="GET" class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm space-y-5">
+        <h3 class="font-semibold text-stone-800 text-sm uppercase tracking-wider">Filters</h3>
+
+        <div>
+          <label class="text-xs font-medium text-stone-500 uppercase tracking-wider block mb-2">Type</label>
+          <div class="space-y-1.5">
+            <% ['rent','buy','sell'].forEach(t => { %>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="type" value="<%= t %>"
+                       <%= filters.type === t ? 'checked' : '' %>
+                       class="accent-brand-500" />
+                <span class="text-sm text-stone-700 capitalize"><%= t %></span>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-medium text-stone-500 uppercase tracking-wider block mb-2">Category</label>
+          <div class="space-y-1.5">
+            <% ['furniture','appliance','decor','electronics','other'].forEach(c => { %>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="category" value="<%= c %>"
+                       <%= filters.category === c ? 'checked' : '' %>
+                       class="accent-brand-500" />
+                <span class="text-sm text-stone-700 capitalize"><%= c %></span>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-medium text-stone-500 uppercase tracking-wider block mb-2">City</label>
+          <input type="text" name="city" value="<%= filters.city || '' %>" placeholder="e.g. Mumbai"
+                 class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+        </div>
+
+        <div class="flex flex-col gap-2 pt-1">
+          <button type="submit"
+                  class="w-full bg-brand-500 hover:bg-brand-600 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+            Apply Filters
+          </button>
+          <a href="/products"
+             class="w-full text-center border border-stone-200 text-stone-600 hover:bg-stone-50 py-2 rounded-lg text-sm transition-colors">
+            Clear All
+          </a>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Product Grid -->
+    <div class="flex-1">
+      <% if (products.length === 0) { %>
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+          <i data-lucide="search-x" class="w-14 h-14 text-stone-300 mb-4"></i>
+          <h3 class="font-semibold text-stone-600 text-lg mb-1">No listings found</h3>
+          <p class="text-stone-400 text-sm mb-6">Try adjusting your filters or search term</p>
+          <a href="/products" class="text-brand-500 hover:underline text-sm font-medium">Clear filters</a>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+          <% products.forEach(product => { %>
+            <a href="/products/<%= product._id %>"
+               class="group bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+
+              <!-- Image -->
+              <div class="relative overflow-hidden h-48 bg-stone-100">
+                <img src="<%= product.images[0]?.url || 'https://placehold.co/400x300?text=No+Image' %>"
+                     alt="<%= product.title %>"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <!-- Badges -->
+                <div class="absolute top-3 left-3 flex gap-1.5">
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize
+                    <%= product.type === 'rent' ? 'bg-blue-100 text-blue-700' :
+                        product.type === 'buy'  ? 'bg-emerald-100 text-emerald-700' :
+                                                  'bg-amber-100 text-amber-700' %>">
+                    <%= product.type %>
+                  </span>
+                  <% if (product.status !== 'available') { %>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700 capitalize">
+                      <%= product.status %>
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Body -->
+              <div class="p-4">
+                <p class="text-xs text-stone-400 capitalize mb-1"><%= product.category %></p>
+                <h3 class="font-semibold text-stone-900 truncate mb-1"><%= product.title %></h3>
+                <div class="flex items-center gap-1 text-stone-400 text-xs mb-3">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                  <span><%= product.city %></span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-lg font-bold text-stone-900">₹<%= product.price.toLocaleString('en-IN') %></span>
+                    <% if (product.type === 'rent' && product.rentPerMonth) { %>
+                      <span class="text-xs text-stone-400 ml-1">/ mo</span>
+                    <% } %>
+                  </div>
+                  <div class="flex items-center gap-1 text-amber-400 text-xs">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>
+                    <span class="text-stone-600 font-medium"><%= product.averageRating || '—' %></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
