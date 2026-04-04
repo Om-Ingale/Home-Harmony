@@ -6,7 +6,7 @@
     <p class="text-stone-500 mt-1">Update the details for "<%= product.title %>"</p>
   </div>
 
-  <form action="/products/<%= product._id %>?_method=PUT" method="POST"
+  <form action="/products/<%= product._id %>?_method=PUT" method="POST" enctype="multipart/form-data"
         class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 space-y-6">
 
     <div>
@@ -71,7 +71,65 @@
                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
       </div>
     </div>
+    <!-- ── Existing Images ───────────────────────────────────────────────── -->
+<% if (product.images && product.images.length > 0) { %>
+<div>
+  <label class="block text-sm font-medium text-stone-700 mb-2">
+    Current Images
+    <span class="text-stone-400 font-normal text-xs ml-1">— click ✕ to mark for deletion</span>
+  </label>
+  <div class="flex flex-wrap gap-3" id="existing-images-container">
+    <% product.images.forEach((img, i) => { %>
+      <div class="relative" id="img-wrapper-<%= i %>">
+        <img src="<%= img.url %>" alt="Image <%= i+1 %>"
+             id="existing-img-<%= i %>"
+             class="w-24 h-24 object-cover rounded-xl border-2 border-stone-200 transition-all" />
 
+        <!-- Hidden checkbox sent on form submit -->
+        <input type="checkbox"
+               name="deleteImages[]"
+               value="<%= img.filename %>"
+               id="del-check-<%= i %>"
+               class="hidden" />
+
+        <!-- X Button — always visible on hover, red when marked -->
+        <button type="button"
+                onclick="toggleDeleteImage(<%= i %>)"
+                id="del-btn-<%= i %>"
+                class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-stone-400 hover:bg-red-500
+                       rounded-full flex items-center justify-center transition-colors shadow-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+               class="w-2.5 h-2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<% } %>
+
+<!-- ── Add New Images ─────────────────────────────────────────────────── -->
+<div>
+  <label class="block text-sm font-medium text-stone-700 mb-1.5">
+    Add More Images
+    <span class="text-stone-400 font-normal text-xs ml-1">(you can add multiple batches)</span>
+  </label>
+  <div class="border-2 border-dashed border-stone-200 rounded-xl p-5 text-center
+              hover:border-brand-300 transition-colors cursor-pointer"
+       onclick="document.getElementById('new-images-input').click()">
+    <i data-lucide="image-plus" class="w-7 h-7 text-stone-300 mx-auto mb-1"></i>
+    <p class="text-sm text-stone-400">Click to upload new images</p>
+    <p class="text-xs text-stone-300 mt-0.5">JPG, PNG, WEBP</p>
+    <!-- NOTE: id changed to new-images-input to avoid conflicts -->
+    <input type="file" id="new-images-input" multiple accept="image/*" class="hidden"
+           onchange="addNewImages(this)" />
+  </div>
+
+  <!-- New image previews with remove option -->
+  <div id="new-image-preview" class="flex flex-wrap gap-3 mt-3"></div>
+
+  <!-- Hidden file inputs are appended here dynamically -->
+  <div id="file-inputs-container"></div>
+</div>
     <div>
       <label class="block text-sm font-medium text-stone-700 mb-1.5" for="status">Status</label>
       <select name="product[status]" id="status"
@@ -93,4 +151,83 @@
       </a>
     </div>
   </form>
+ <script>
+  // ── Toggle existing image deletion ──────────────────────────────────────
+  function toggleDeleteImage(i) {
+    const checkbox = document.getElementById('del-check-' + i);
+    const btn      = document.getElementById('del-btn-' + i);
+    const imgEl    = document.getElementById('existing-img-' + i);
+
+    const isMarked = !checkbox.checked;
+    checkbox.checked = isMarked;
+
+    if (isMarked) {
+      // Mark for deletion — red X, dim image, red border
+      btn.classList.remove('bg-stone-400', 'hover:bg-red-500');
+      btn.classList.add('bg-red-500');
+      imgEl.classList.add('opacity-40', 'border-red-400');
+      imgEl.classList.remove('border-stone-200');
+    } else {
+      // Unmark — restore normal look
+      btn.classList.add('bg-stone-400', 'hover:bg-red-500');
+      btn.classList.remove('bg-red-500');
+      imgEl.classList.remove('opacity-40', 'border-red-400');
+      imgEl.classList.add('border-stone-200');
+    }
+  }
+
+  // ── Add new images (accumulates across multiple picks) ──────────────────
+  let newFileCount = 0;   // tracks how many hidden inputs we've created
+
+  function addNewImages(input) {
+    const preview   = document.getElementById('new-image-preview');
+    const container = document.getElementById('file-inputs-container');
+
+    Array.from(input.files).forEach((file, idx) => {
+      const fileIndex = newFileCount++;
+
+      // Create a hidden input that holds this single file via DataTransfer
+      const dt = new DataTransfer();
+      dt.items.add(file);
+
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type     = 'file';
+      hiddenInput.name     = 'product[images]';
+      hiddenInput.id       = 'file-input-' + fileIndex;
+      hiddenInput.files    = dt.files;
+      hiddenInput.style.display = 'none';
+      container.appendChild(hiddenInput);
+
+      // Preview thumbnail with remove button
+      const reader = new FileReader();
+      reader.onload = e => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative';
+        wrapper.id = 'new-img-wrapper-' + fileIndex;
+
+        wrapper.innerHTML = `
+          <img src="${e.target.result}"
+               class="w-24 h-24 object-cover rounded-xl border-2 border-brand-200" />
+          <button type="button"
+                  onclick="removeNewImage(${fileIndex})"
+                  class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-600
+                         rounded-full flex items-center justify-center shadow-sm transition-colors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                 class="w-2.5 h-2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>`;
+        preview.appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset the visible input so same file can be picked again
+    input.value = '';
+  }
+
+  // ── Remove a newly added image before submit ────────────────────────────
+  function removeNewImage(fileIndex) {
+    document.getElementById('new-img-wrapper-' + fileIndex)?.remove();
+    document.getElementById('file-input-' + fileIndex)?.remove();
+  }
+</script>
 </div>

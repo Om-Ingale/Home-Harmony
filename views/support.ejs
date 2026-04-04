@@ -1,0 +1,81 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+  <div class="mb-10 text-center">
+    <span class="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-100 text-brand-600 text-xs font-medium px-3 py-1.5 rounded-full mb-4">
+      <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Support Center
+    </span>
+    <h1 class="font-display text-4xl font-bold text-stone-900 mb-3">How can we help you?</h1>
+    <p class="text-stone-500 text-lg">Find answers, get help, or contact our team</p>
+  </div>
+
+  <!-- Contact Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+      <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="mail" class="w-5 h-5 text-blue-500"></i>
+      </div>
+      <h3 class="font-semibold text-stone-800 mb-1">Email Us</h3>
+      <p class="text-sm text-stone-400 mb-3">We reply within 24 hours</p>
+      <a href="mailto:support@homeharmony.in" class="text-sm text-brand-500 font-medium hover:underline">
+        support@homeharmony.in
+      </a>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+      <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="phone" class="w-5 h-5 text-green-500"></i>
+      </div>
+      <h3 class="font-semibold text-stone-800 mb-1">Call Us</h3>
+      <p class="text-sm text-stone-400 mb-3">Mon–Sat, 10am–6pm IST</p>
+      <a href="tel:+918800000000" class="text-sm text-brand-500 font-medium hover:underline">
+        +91 88000 00000
+      </a>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+      <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="message-circle" class="w-5 h-5 text-purple-500"></i>
+      </div>
+      <h3 class="font-semibold text-stone-800 mb-1">Live Chat</h3>
+      <p class="text-sm text-stone-400 mb-3">Chat with our assistant</p>
+      <button onclick="document.getElementById('chatbot-toggle').click()"
+              class="text-sm text-brand-500 font-medium hover:underline">
+        Start Chat →
+      </button>
+    </div>
+  </div>
+
+  <!-- FAQs -->
+  <h2 class="font-display text-2xl font-bold text-stone-900 mb-6">Frequently Asked Questions</h2>
+  <div class="space-y-3" id="faq-list">
+    <% const faqs = [
+      { q: "How do I list an item for rent or sale?", a: "Sign in, click 'List Item' in the navbar, fill in the details, upload photos, and submit. Your listing goes live instantly." },
+      { q: "How does payment work?", a: "We use Razorpay for secure payments. Buyers pay online and funds are released to the seller after confirmation." },
+      { q: "Can I edit or delete my listing?", a: "Yes! Go to your listing page and use the Edit or Delete buttons — available only to the listing owner." },
+      { q: "What if I have a dispute with a seller/buyer?", a: "Contact our support team at support@homeharmony.in with order details and we'll mediate within 48 hours." },
+      { q: "Is my payment information safe?", a: "Absolutely. We never store card details. All transactions are encrypted and processed by Razorpay (PCI-DSS compliant)." },
+      { q: "How do I report a fraudulent listing?", a: "Click the 'Report' option on the listing page or email us directly with the listing URL." },
+    ]; %>
+    <% faqs.forEach((faq, i) => { %>
+      <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+        <button onclick="toggleFaq(<%= i %>)"
+                class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-stone-50 transition-colors">
+          <span class="font-medium text-stone-800 text-sm"><%= faq.q %></span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 shrink-0 transition-transform" id="faq-icon-<%= i %>"></i>
+        </button>
+        <div id="faq-answer-<%= i %>" class="hidden px-6 pb-5">
+          <p class="text-sm text-stone-500 leading-relaxed"><%= faq.a %></p>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<script>
+  function toggleFaq(i) {
+    const answer = document.getElementById('faq-answer-' + i);
+    const icon   = document.getElementById('faq-icon-' + i);
+    const isOpen = !answer.classList.contains('hidden');
+    answer.classList.toggle('hidden', isOpen);
+    icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+</script>

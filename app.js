@@ -94,6 +94,10 @@ app.use("/products", reviewRoutes); // /products/:id/reviews
 app.use("/payment", paymentRoutes);
 app.use("/admin", adminRoutes);
 
+app.get("/support", (req, res) => {
+  res.render("support", { title: "Help & Support — Home Harmony" });
+});
+
 // ─── 404 Handler ─────────────────────────────
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
@@ -109,4 +113,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Home Harmony running at http://localhost:${PORT}`);
 });
-

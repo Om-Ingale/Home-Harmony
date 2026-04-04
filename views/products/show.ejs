@@ -12,24 +12,110 @@
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to listings
       </a>
 
-      <!-- Main Image -->
-      <div class="rounded-2xl overflow-hidden bg-stone-100 aspect-video">
-        <img src="<%= product.images[0] ? product.images[0].url : 'https://placehold.co/800x500?text=No+Image' %>"
-             alt="<%= product.title %>"
-             class="w-full h-full object-cover" />
+      <!-- ── Image Gallery ─────────────────────────────────────────────────── -->
+<div class="space-y-3">
+
+  <!-- Main Image with Prev/Next arrows -->
+  <div class="relative rounded-2xl overflow-hidden bg-stone-100 aspect-video group">
+    <% product.images.forEach(function(img, i) { %>
+      <img src="<%= img.url %>"
+           alt="Image <%= i + 1 %>"
+           id="main-img-<%= i %>"
+           class="main-gallery-img absolute inset-0 w-full h-full object-cover transition-opacity duration-300 <%= i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' %>" />
+    <% }); %>
+
+    <!-- Prev Button -->
+    <% if (product.images.length > 1) { %>
+      <button onclick="changeImage(-1)"
+              class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80
+                     hover:bg-white rounded-full shadow-md flex items-center justify-center
+                     opacity-0 group-hover:opacity-100 transition-opacity">
+        <i data-lucide="chevron-left" class="w-5 h-5 text-stone-700"></i>
+      </button>
+
+      <!-- Next Button -->
+      <button onclick="changeImage(1)"
+              class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80
+                     hover:bg-white rounded-full shadow-md flex items-center justify-center
+                     opacity-0 group-hover:opacity-100 transition-opacity">
+        <i data-lucide="chevron-right" class="w-5 h-5 text-stone-700"></i>
+      </button>
+
+      <!-- Dot indicators -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+        <% product.images.forEach(function(img, i) { %>
+          <button onclick="goToImage(<%= i %>)"
+                  id="dot-<%= i %>"
+                  class="w-2 h-2 rounded-full transition-all <%= i === 0 ? 'bg-white scale-125' : 'bg-white/50' %>">
+          </button>
+        <% }); %>
       </div>
 
-      <!-- Thumbnails -->
-      <% if (product.images.length > 1) { %>
-        <div class="flex gap-3 overflow-x-auto pb-1">
-          <% product.images.forEach(function(img, i) { %>
-            <img src="<%= img.url %>"
-                 alt="Image <%= i + 1 %>"
-                 class="w-20 h-20 object-cover rounded-xl border-2 border-stone-200
-                        cursor-pointer hover:border-brand-400 transition-colors shrink-0" />
-          <% }); %>
-        </div>
-      <% } %>
+      <!-- Image counter -->
+      <div class="absolute top-3 right-3 z-20 bg-black/40 text-white text-xs px-2.5 py-1 rounded-full">
+        <span id="img-counter">1</span> / <%= product.images.length %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Thumbnails -->
+  <% if (product.images.length > 1) { %>
+    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <% product.images.forEach(function(img, i) { %>
+        <img src="<%= img.url %>"
+             alt="Thumbnail <%= i + 1 %>"
+             id="thumb-<%= i %>"
+             onclick="goToImage(<%= i %>)"
+             class="w-20 h-20 shrink-0 object-cover rounded-xl border-2 cursor-pointer
+                    transition-all hover:border-brand-400
+                    <%= i === 0 ? 'border-brand-500 shadow-md' : 'border-stone-200' %>" />
+      <% }); %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  let currentImg = 0;
+  const totalImgs = <%= product.images.length %>;
+
+  function goToImage(index) {
+    // Hide current
+    document.getElementById('main-img-' + currentImg).classList.remove('opacity-100', 'z-10');
+    document.getElementById('main-img-' + currentImg).classList.add('opacity-0', 'z-0');
+    document.getElementById('dot-' + currentImg)?.classList.remove('bg-white', 'scale-125');
+    document.getElementById('dot-' + currentImg)?.classList.add('bg-white/50');
+    document.getElementById('thumb-' + currentImg)?.classList.remove('border-brand-500', 'shadow-md');
+    document.getElementById('thumb-' + currentImg)?.classList.add('border-stone-200');
+
+    // Show new
+    currentImg = (index + totalImgs) % totalImgs;
+    document.getElementById('main-img-' + currentImg).classList.remove('opacity-0', 'z-0');
+    document.getElementById('main-img-' + currentImg).classList.add('opacity-100', 'z-10');
+    document.getElementById('dot-' + currentImg)?.classList.remove('bg-white/50');
+    document.getElementById('dot-' + currentImg)?.classList.add('bg-white', 'scale-125');
+    document.getElementById('thumb-' + currentImg)?.classList.remove('border-stone-200');
+    document.getElementById('thumb-' + currentImg)?.classList.add('border-brand-500', 'shadow-md');
+
+    // Update counter
+    const counter = document.getElementById('img-counter');
+    if (counter) counter.textContent = currentImg + 1;
+  }
+
+  function changeImage(direction) {
+    goToImage(currentImg + direction);
+  }
+
+  // ── Touch/Swipe support ───────────────────────────────────────────────
+  let touchStartX = 0;
+  const gallery = document.querySelector('.group.relative.rounded-2xl');
+  if (gallery) {
+    gallery.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    gallery.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) changeImage(diff > 0 ? 1 : -1);
+    });
+  }
+</script>
 
       <!-- Badges + Title -->
       <div>
@@ -230,16 +316,44 @@
         <!-- Primary CTA -->
         <% if (product.status === 'available') { %>
           <% if (currentUser && !product.owner._id.equals(currentUser._id)) { %>
-            <button class="w-full bg-brand-500 hover:bg-brand-600 text-white
-                           font-semibold py-3 rounded-xl transition-colors shadow-sm">
-              <% if (product.type === 'rent') { %>
-                🏠 Request to Rent
-              <% } else if (product.type === 'buy') { %>
-                🛒 Buy Now
-              <% } else { %>
-                💬 Contact Seller
-              <% } %>
-            </button>
+            <% if (product.type === 'sell') { %>
+  <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>&body=Hi <%= product.owner.username %>,%0A%0AI'm interested in your listing '<%= product.title %>' on Home Harmony.%0A%0APlease let me know if it's still available.%0A%0AThanks"
+     class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600
+            text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
+    💬 Contact Seller
+  </a>
+<% } else { %>
+  <button onclick="showContactModal()"
+          class="w-full bg-brand-500 hover:bg-brand-600 text-white
+                 font-semibold py-3 rounded-xl transition-colors shadow-sm">
+    <% if (product.type === 'rent') { %>🏠 Request to Rent<% } else { %>🛒 Buy Now<% } %>
+  </button>
+<% } %>
+
+<!-- Contact Modal for Rent/Buy -->
+<div id="contact-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+    <h3 class="font-semibold text-stone-900 mb-1">Contact Seller</h3>
+    <p class="text-sm text-stone-500 mb-4">Reach out to <strong><%= product.owner.username %></strong> about this listing</p>
+    <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>"
+       class="flex items-center gap-2 w-full justify-center bg-brand-500 hover:bg-brand-600
+              text-white font-semibold py-2.5 rounded-xl mb-2 transition-colors text-sm">
+      <i data-lucide="mail" class="w-4 h-4"></i> Send Email
+    </a>
+    <button onclick="document.getElementById('contact-modal').classList.add('hidden')"
+            class="w-full py-2.5 text-sm text-stone-500 hover:text-stone-700 transition-colors">
+      Cancel
+    </button>
+  </div>
+</div>
+<script>
+  function showContactModal() {
+    document.getElementById('contact-modal').classList.remove('hidden');
+  }
+  document.getElementById('contact-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+  });
+</script>
           <% } else if (!currentUser) { %>
             <a href="/auth/login"
                class="w-full block text-center bg-brand-500 hover:bg-brand-600

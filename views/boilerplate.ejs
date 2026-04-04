@@ -84,7 +84,156 @@
   <%- include('includes/footer') %>
 
   <!-- Init Lucide icons -->
-  <script>lucide.createIcons();</script>
-  <script src="/js/main.js"></script>
+  <script>
+  lucide.createIcons();
+  // Re-run after full page load to catch any delayed elements
+  window.addEventListener('load', () => lucide.createIcons());
+</script>
+<script src="/js/main.js"></script>
+
+  <!-- ── Floating Chatbot ──────────────────────────────────────────────── -->
+  <div id="chatbot-wrapper" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+
+    <!-- Chat Window -->
+    <div id="chatbot-box"
+         class="hidden w-80 bg-white rounded-2xl shadow-2xl border border-stone-100 overflow-hidden"
+         style="height: 420px; display: none; flex-direction: column;">
+
+      <!-- Header -->
+      <div class="bg-brand-500 px-4 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+          </div>
+          <div>
+            <p class="text-white text-sm font-semibold">Harmony Assistant</p>
+            <p class="text-orange-100 text-xs">Always here to help</p>
+          </div>
+        </div>
+        <button onclick="toggleChat()" class="text-white/70 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-stone-50">
+        <div class="flex gap-2">
+          <div class="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-brand-600"></i>
+          </div>
+          <div class="bg-white rounded-xl rounded-tl-none px-3 py-2 text-sm text-stone-700 shadow-sm max-w-xs">
+            👋 Hi! I'm the Home Harmony assistant. How can I help you today?
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Query Chips -->
+      <div id="quick-queries" class="px-3 py-2 bg-white border-t border-stone-100 flex flex-wrap gap-1.5 shrink-0">
+        <button onclick="sendQuery('How to list an item?')"         class="chip">How to list an item?</button>
+        <button onclick="sendQuery('How does payment work?')"       class="chip">How does payment work?</button>
+        <button onclick="sendQuery('How to contact a seller?')"     class="chip">How to contact a seller?</button>
+        <button onclick="sendQuery('Is my data safe?')"             class="chip">Is my data safe?</button>
+        <button onclick="sendQuery('How to delete a listing?')"     class="chip">How to delete a listing?</button>
+        <button onclick="sendQuery('Rental process?')"              class="chip">Rental process?</button>
+      </div>
+    </div>
+
+    <!-- Toggle Bubble -->
+    <button id="chatbot-toggle" onclick="toggleChat()"
+            class="w-14 h-14 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-lg
+                   flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+      <i data-lucide="message-circle" class="w-6 h-6"></i>
+    </button>
+  </div>
+
+  <style>
+    .chip {
+      font-size: 0.7rem;
+      background: #f5f5f4;
+      color: #57534e;
+      border: 1px solid #e7e5e4;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .chip:hover { background: #fdf6ee; color: #dc7420; border-color: #f4d4a8; }
+  </style>
+
+  <script>
+    const chatAnswers = {
+      "How to list an item?":     "To list an item: 1️⃣ Sign in 2️⃣ Click 'List Item' in the navbar 3️⃣ Fill in details & upload photos 4️⃣ Hit 'Create Listing' — goes live instantly! ✅",
+      "How does payment work?":   "We use Razorpay 🔒. Pay via card, UPI, or netbanking. Funds are released to the seller after order confirmation.",
+      "How to contact a seller?": "On any listing page, click the 'Contact Seller' button in the price card on the right side 📩",
+      "Is my data safe?":         "Absolutely! We never store card details. All transactions are encrypted via Razorpay (PCI-DSS compliant) 🛡️",
+      "How to delete a listing?": "Go to your listing page and click the red 'Delete' button — only visible to the listing owner ⚠️",
+      "Rental process?":          "1️⃣ Browse rentals 2️⃣ Click 'Request to Rent' 3️⃣ Pay via Razorpay 4️⃣ Coordinate delivery with the owner 🏠",
+    };
+
+    let chatOpen = false;
+
+    function toggleChat() {
+  chatOpen = !chatOpen;
+  const box = document.getElementById('chatbot-box');
+  if (chatOpen) {
+    box.style.display = 'flex';
+    setTimeout(() => {
+      box.style.opacity = '1';
+      lucide.createIcons(); // runs AFTER box is visible
+    }, 10);
+  } else {
+    box.style.opacity = '0';
+    setTimeout(() => box.style.display = 'none', 200);
+  }
+}
+
+    function sendQuery(question) {
+      const messages = document.getElementById('chat-messages');
+      const queries  = document.getElementById('quick-queries');
+
+      // User bubble
+      messages.innerHTML += `
+        <div class="flex gap-2 justify-end">
+          <div class="bg-brand-500 rounded-xl rounded-tr-none px-3 py-2 text-sm text-white shadow-sm max-w-xs" style="background:#dc7420">
+            ${question}
+          </div>
+        </div>`;
+      messages.scrollTop = messages.scrollHeight;
+
+      // Typing indicator
+      const typingId = 'typing-' + Date.now();
+      messages.innerHTML += `
+        <div id="${typingId}" class="flex gap-2">
+          <div class="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-brand-600"></i>
+          </div>
+          <div class="bg-white rounded-xl rounded-tl-none px-3 py-2 text-sm text-stone-400 shadow-sm">
+            <span style="animation: pulse 1s infinite">Typing...</span>
+          </div>
+        </div>`;
+      messages.scrollTop = messages.scrollHeight;
+      lucide.createIcons();
+
+      setTimeout(() => {
+        document.getElementById(typingId)?.remove();
+        const answer = chatAnswers[question] ||
+          "I'm not sure about that. Please <a href='/support' style='color:#dc7420;text-decoration:underline'>visit our support page</a> for more help.";
+        messages.innerHTML += `
+          <div class="flex gap-2">
+            <div class="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+              <i data-lucide="bot" class="w-3.5 h-3.5 text-brand-600"></i>
+            </div>
+            <div class="bg-white rounded-xl rounded-tl-none px-3 py-2 text-sm text-stone-700 shadow-sm max-w-xs leading-relaxed">
+              ${answer}
+            </div>
+          </div>`;
+        messages.scrollTop = messages.scrollHeight;
+
+        // Hide chips after first answer
+        lucide.createIcons();
+      }, 800);
+    }
+  </script>
+
 </body>
 </html>
