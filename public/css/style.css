@@ -1,11 +1,19 @@
 /* public/css/style.css */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-body { font-family: 'DM Sans', sans-serif; }
+body {
+  font-family: 'DM Sans', sans-serif;
+}
 
-h1, h2, h3,
-.font-display { font-family: 'Playfair Display', serif; }
+h1,
+h2,
+h3,
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
 
 /* Flash message fade-out */
 .flash-success,
@@ -14,15 +22,35 @@ h1, h2, h3,
 }
 
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar       { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f5f5f4; }
-::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
 
 /* Smooth focus ring */
 input:focus,
@@ -31,4 +59,20 @@ textarea:focus,
 button:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(220, 116, 32, 0.25);
+}
+
+@keyframes fadeInSmooth {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeInSmooth 0.3s ease-out;
 }

@@ -66,23 +66,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 4000);
 
 });
-
-//loader overlay on form submit (product create/edit)
+// loader overlay on form submit (product create/edit)
 document.addEventListener("DOMContentLoaded", () => {
 
-  // FORM LOADER (product create/edit)
-  document.querySelectorAll("form").forEach(form => {
-    form.addEventListener("submit", () => {
-      document.getElementById("loaderOverlay").classList.remove("hidden");
-    });
-  });
+  const form = document.getElementById("productForm");
+  const loader = document.getElementById("loaderOverlay");
 
-  if (form) {
+  // SHOW loader on submit
+  if (form && loader) {
     form.addEventListener("submit", () => {
-      const loader = document.getElementById("loaderOverlay");
-      loader.classList.remove("hidden");
+      loader.classList.remove("pointer-events-none");
+      loader.classList.remove("opacity-0");
+      loader.classList.add("opacity-100");
 
-      // disable button (prevent double click)
+      // disable button
       const btn = form.querySelector("button[type='submit']");
       if (btn) {
         btn.disabled = true;
@@ -90,5 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // HIDE loader when page loads (IMPORTANT FIX)
+  window.addEventListener("pageshow", () => {
+    if (loader) {
+      loader.classList.add("opacity-0", "pointer-events-none");
+      loader.classList.remove("opacity-100");
+    }
+  });
 
 });

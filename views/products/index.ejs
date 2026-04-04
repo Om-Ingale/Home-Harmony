@@ -1,9 +1,9 @@
 <%- layout('boilerplate') %>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-2 ">
 
   <!-- Header + Search -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 sticky">
     <div>
       <h1 class="font-display text-3xl font-bold text-stone-900">Browse Listings</h1>
       <p class="text-stone-500 mt-1"><%= products.length %> item<%= products.length !== 1 ? 's' : '' %> found</p>
@@ -22,7 +22,7 @@
   <div class="flex flex-col lg:flex-row gap-8">
 
     <!-- Sidebar Filters -->
-    <aside class="lg:w-56 shrink-0">
+    <aside class="lg:w-56 shrink-0 sticky top-24 self-start">
       <form action="/products" method="GET" class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm space-y-5">
         <h3 class="font-semibold text-stone-800 text-sm uppercase tracking-wider">Filters</h3>
 
