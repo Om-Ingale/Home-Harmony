@@ -130,6 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     skeleton.style.display = "none";
     real.classList.remove("hidden");
-  }, 300); // ⚡ sweet spot (200–300ms)
+  }, 400); // ⚡ sweet spot (200–300ms)
 
 });
