@@ -51,9 +51,26 @@
 </head>
 
 <body class="font-body bg-stone-50 text-stone-800 min-h-screen flex flex-col">
-
   <%- include('includes/navbar') %>
+  <!-- PREMIUM LOADER -->
+<div id="loaderOverlay" class="fixed inset-0 backdrop-blur-md bg-white/60 flex items-center justify-center z-50 hidden">
+  
+  <div class="flex flex-col items-center gap-4">
+    
+    <div class="relative flex items-center justify-center">
+      
+      <!-- Icon -->
+      <i data-lucide="home" class="w-10 h-10 text-[#dc7420] animate-pulse z-10"></i>
 
+      <!-- Spinner -->
+      <div class="absolute w-16 h-16 border-4 border-transparent border-t-[#dc7420] rounded-full animate-spin shadow-[0_0_20px_#dc7420]"></div>
+
+    </div>
+
+    <p class="text-gray-800 text-sm tracking-wide">Processing your request...</p>
+
+  </div>
+</div>
   <!-- Flash Messages -->
   <div class="max-w-7xl mx-auto w-full px-4 pt-4">
     <% if (success && success.length) { %>

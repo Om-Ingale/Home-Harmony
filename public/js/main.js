@@ -3,7 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   // ── Mobile menu toggle ───────────────────────
-  const menuBtn  = document.getElementById("mobile-menu-btn");
+  const menuBtn = document.getElementById("mobile-menu-btn");
   const mobileMenu = document.getElementById("mobile-menu");
   if (menuBtn && mobileMenu) {
     menuBtn.addEventListener("click", () => {
@@ -25,13 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ── Star rating widget (product show page) ───
-  const stars      = document.querySelectorAll(".star-btn");
+  const stars = document.querySelectorAll(".star-btn");
   const ratingInput = document.getElementById("rating-input");
   if (stars.length && ratingInput) {
     const paint = (val) => {
       stars.forEach((s) => {
         s.classList.toggle("text-amber-400", parseInt(s.dataset.val) <= val);
-        s.classList.toggle("text-stone-300",  parseInt(s.dataset.val) >  val);
+        s.classList.toggle("text-stone-300", parseInt(s.dataset.val) > val);
       });
     };
     paint(parseInt(ratingInput.value) || 5);
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ── Show rentPerMonth field only when type=rent ──
-  const typeSelect        = document.getElementById("type");
+  const typeSelect = document.getElementById("type");
   const rentPerMonthField = document.getElementById("rentPerMonthField");
   if (typeSelect && rentPerMonthField) {
     const toggle = () => {
@@ -64,5 +64,31 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => el.remove(), 500);
     });
   }, 4000);
+
+});
+
+//loader overlay on form submit (product create/edit)
+document.addEventListener("DOMContentLoaded", () => {
+
+  // FORM LOADER (product create/edit)
+  document.querySelectorAll("form").forEach(form => {
+    form.addEventListener("submit", () => {
+      document.getElementById("loaderOverlay").classList.remove("hidden");
+    });
+  });
+
+  if (form) {
+    form.addEventListener("submit", () => {
+      const loader = document.getElementById("loaderOverlay");
+      loader.classList.remove("hidden");
+
+      // disable button (prevent double click)
+      const btn = form.querySelector("button[type='submit']");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+      }
+    });
+  }
 
 });
