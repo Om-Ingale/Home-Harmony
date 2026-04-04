@@ -69,31 +69,67 @@ document.addEventListener("DOMContentLoaded", () => {
 // loader overlay on form submit (product create/edit)
 document.addEventListener("DOMContentLoaded", () => {
 
-  const form = document.getElementById("productForm");
-  const loader = document.getElementById("loaderOverlay");
+  const loader = document.getElementById("globalLoader");
 
-  // SHOW loader on submit
-  if (form && loader) {
-    form.addEventListener("submit", () => {
-      loader.classList.remove("pointer-events-none");
-      loader.classList.remove("opacity-0");
-      loader.classList.add("opacity-100");
-
-      // disable button
-      const btn = form.querySelector("button[type='submit']");
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Processing...";
-      }
-    });
+  function showLoader() {
+    if (!loader) return;
+    loader.classList.remove("pointer-events-none", "opacity-0");
+    loader.classList.add("opacity-100");
   }
 
-  // HIDE loader when page loads (IMPORTANT FIX)
-  window.addEventListener("pageshow", () => {
-    if (loader) {
-      loader.classList.add("opacity-0", "pointer-events-none");
-      loader.classList.remove("opacity-100");
-    }
+  function hideLoader() {
+    if (!loader) return;
+    loader.classList.remove("opacity-100");
+    loader.classList.add("opacity-0");
+
+    setTimeout(() => {
+      loader.classList.add("pointer-events-none");
+    }, 300);
+  }
+
+  // 🔥 LINKS
+  document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      if (
+        link.target === "_blank" ||
+        link.href.includes("#") ||
+        link.hasAttribute("download")
+      ) return;
+
+      showLoader();
+    });
   });
+
+  // 🔥 FORMS
+  document.querySelectorAll("form").forEach(form => {
+    form.addEventListener("submit", () => {
+      showLoader();
+    });
+  });
+
+  // 🔥 PAGE LOAD COMPLETE
+  window.addEventListener("pageshow", () => {
+    hideLoader();
+  });
+
+});
+
+// ── Product listing skeleton loader (index page) ──
+document.addEventListener("DOMContentLoaded", () => {
+
+  const skeleton = document.getElementById("skeletonGrid");
+  const real = document.getElementById("realGrid");
+
+  if (!skeleton || !real) return;
+
+  // Step 1: skeleton visible immediately
+  skeleton.style.display = "grid";
+  real.classList.add("hidden");
+
+  // Step 2: after small delay → show real content
+  setTimeout(() => {
+    skeleton.style.display = "none";
+    real.classList.remove("hidden");
+  }, 300); // ⚡ sweet spot (200–300ms)
 
 });

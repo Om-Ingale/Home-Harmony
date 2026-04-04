@@ -53,19 +53,29 @@
 <body class="font-body bg-stone-50 text-stone-800 min-h-screen flex flex-col">
   <%- include('includes/navbar') %>
   <!-- PREMIUM LOADER -->
-<div id="loaderOverlay" class="fixed inset-0 backdrop-blur-md bg-white/60 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-  
-  <div class="flex flex-col items-center gap-4 animate-fadeIn">
-    
-    <div class="relative flex items-center justify-center">
-      
-      <i data-lucide="home" class="w-10 h-10 text-[#dc7420] animate-pulse z-10"></i>
+<div id="globalLoader"
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/70 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
 
-      <div class="absolute w-16 h-16 border-4 border-transparent border-t-[#dc7420] rounded-full animate-spin shadow-[0_0_20px_#dc7420]"></div>
+  <div id="loaderContent" class="flex flex-col items-center transition-all duration-300 scale-95">
+
+    <!-- Spinner with Glow + Logo -->
+    <div class="relative flex items-center justify-center w-16 h-16">
+
+      <!-- Glow pulse -->
+      <div class="absolute w-full h-full rounded-full bg-[#dc7420]/20 blur-xl animate-pulseSlow"></div>
+
+      <!-- Spinning ring -->
+      <div class="absolute w-full h-full border-4 border-[#dc7420]/20 border-t-[#dc7420] rounded-full animate-spinSmooth shadow-[0_0_20px_rgba(220,116,32,0.45)]"></div>
+
+      <!-- Center logo -->
+      <i data-lucide="home" class="w-6 h-6 text-[#dc7420]"></i>
 
     </div>
 
-    <p class="text-gray-1000 text-md tracking-wide py-2">Home Harmony is Processing your request...</p>
+    <!-- Text -->
+    <p class="mt-4 text-gray-800 font-semibold tracking-wide animate-fadeIn">
+      Home Harmony is Processing your request...
+    </p>
 
   </div>
 </div>

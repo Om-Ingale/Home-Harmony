@@ -1,27 +1,41 @@
 // controllers/productController.js  (full Phase 6 version)
 
-const Product           = require("../models/Product");
-const { cloudinary }    = require("../utils/cloudinary");
-const { geocode }       = require("../utils/mapbox");
+const Product = require("../models/Product");
+const { cloudinary } = require("../utils/cloudinary");
+const { geocode } = require("../utils/mapbox");
 
 // ── GET /products ─────────────────────────────────────────────────────────────
 const index = async (req, res) => {
-  const { category, type, city, search } = req.query;
+  const { category, type, city, search, page = 1 } = req.query;
+
+  const limit = 15;
+  const currentPage = parseInt(page) || 1;
+
   const filter = {};
   if (category) filter.category = category;
-  if (type)     filter.type     = type;
-  if (city)     filter.city     = new RegExp(city, "i");
-  if (search)   filter.title    = new RegExp(search, "i");
+  if (type) filter.type = type;
+  if (city) filter.city = new RegExp(city, "i");
+  if (search) filter.title = new RegExp(search, "i");
 
+  // 🔥 total count for pagination
+  const totalProducts = await Product.countDocuments(filter);
+
+  // 🔥 paginated query
   const products = await Product.find(filter)
     .populate("owner", "username avatar")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip((currentPage - 1) * limit)
+    .limit(limit);
+
+  const totalPages = Math.ceil(totalProducts / limit);
 
   res.render("products/index", {
     title: "Browse Listings — Home Harmony",
     products,
     filters: req.query,
     mapboxToken: process.env.MAPBOX_TOKEN,
+    currentPage,
+    totalPages
   });
 };
 
@@ -37,19 +51,19 @@ const createProduct = async (req, res) => {
   // ── Cloudinary uploaded images ────────────────
   if (req.files?.length) {
     productData.images = req.files.map((f) => ({
-      url:      f.path,
+      url: f.path,
       filename: f.filename,
     }));
   } else {
     productData.images = [{
-      url:      "https://placehold.co/800x600?text=Home+Harmony",
+      url: "https://placehold.co/800x600?text=Home+Harmony",
       filename: "placeholder",
     }];
   }
 
   // ── Geocode city + location ───────────────────
   const geoQuery = `${productData.location || ""} ${productData.city}, India`.trim();
-  const geo      = await geocode(geoQuery);
+  const geo = await geocode(geoQuery);
   if (geo) productData.geometry = geo;
 
   const product = new Product(productData);
@@ -72,7 +86,7 @@ const showProduct = async (req, res) => {
   }
 
   res.render("products/show", {
-    title:       `${product.title} — Home Harmony`,
+    title: `${product.title} — Home Harmony`,
     product,
     mapboxToken: process.env.MAPBOX_TOKEN,
     razorpayKey: process.env.RAZORPAY_KEY_ID,
@@ -91,8 +105,8 @@ const renderEditForm = async (req, res) => {
 
 // ── PUT /products/:id ─────────────────────────────────────────────────────────
 const updateProduct = async (req, res) => {
-  const { id }      = req.params;
-  const product     = await Product.findById(id);
+  const { id } = req.params;
+  const product = await Product.findById(id);
   const productData = req.body.product;
 
   // ── Append new uploaded images ─────────────────
@@ -114,7 +128,7 @@ const updateProduct = async (req, res) => {
   // ── Re-geocode if city changed ─────────────────
   if (productData.city && productData.city !== product.city) {
     const geoQuery = `${productData.location || ""} ${productData.city}, India`.trim();
-    const geo      = await geocode(geoQuery);
+    const geo = await geocode(geoQuery);
     if (geo) productData.geometry = geo;
   }
 
