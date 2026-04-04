@@ -178,14 +178,13 @@
                     hover:bg-stone-50 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
             <i data-lucide="pencil" class="w-4 h-4"></i> Edit Listing
           </a>
-          <form action="/products/<%= product._id %>?_method=DELETE" method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this listing?')">
-            <button type="submit"
-                    class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600
-                           hover:bg-red-100 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
-              <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
-            </button>
-          </form>
+          <form id="delete-listing-form" action="/products/<%= product._id %>?_method=DELETE" method="POST">
+  <button type="button" onclick="showDeleteModal()"
+          class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600
+                 hover:bg-red-100 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+    <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+  </button>
+</form>
         </div>
       <% } %>
 
@@ -329,31 +328,6 @@
     <% if (product.type === 'rent') { %>🏠 Request to Rent<% } else { %>🛒 Buy Now<% } %>
   </button>
 <% } %>
-
-<!-- Contact Modal for Rent/Buy -->
-<div id="contact-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-    <h3 class="font-semibold text-stone-900 mb-1">Contact Seller</h3>
-    <p class="text-sm text-stone-500 mb-4">Reach out to <strong><%= product.owner.username %></strong> about this listing</p>
-    <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>"
-       class="flex items-center gap-2 w-full justify-center bg-brand-500 hover:bg-brand-600
-              text-white font-semibold py-2.5 rounded-xl mb-2 transition-colors text-sm">
-      <i data-lucide="mail" class="w-4 h-4"></i> Send Email
-    </a>
-    <button onclick="document.getElementById('contact-modal').classList.add('hidden')"
-            class="w-full py-2.5 text-sm text-stone-500 hover:text-stone-700 transition-colors">
-      Cancel
-    </button>
-  </div>
-</div>
-<script>
-  function showContactModal() {
-    document.getElementById('contact-modal').classList.remove('hidden');
-  }
-  document.getElementById('contact-modal')?.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.add('hidden');
-  });
-</script>
           <% } else if (!currentUser) { %>
             <a href="/auth/login"
                class="w-full block text-center bg-brand-500 hover:bg-brand-600
@@ -585,3 +559,158 @@
   }
 </script>
 <% } %>
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--  Contact Modal — lives outside ALL stacking contexts at body level        -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<% if (currentUser && product.status === 'available' && !product.owner._id.equals(currentUser._id) && product.type !== 'sell') { %>
+<div id="contact-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:999999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);">
+  <div style="display:flex; align-items:center; justify-content:center;
+              width:100%; height:100%; padding:16px; box-sizing:border-box;">
+    <div style="background:#fff; border-radius:16px; padding:24px; max-width:380px;
+                width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative;
+                box-sizing:border-box;">
+
+      <!-- Close X -->
+      <button onclick="closeContactModal()"
+              style="position:absolute; top:12px; right:12px; width:28px; height:28px;
+                     border-radius:50%; background:#f5f5f4; border:none; cursor:pointer;
+                     display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2.5"
+             style="width:13px; height:13px;">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <h3 style="font-size:16px; font-weight:600; color:#1c1917; margin:0 0 4px;">
+        Contact Seller
+      </h3>
+      <p style="font-size:13px; color:#78716c; margin:0 0 16px;">
+        Reach out to <strong style="color:#292524;"><%= product.owner.username %></strong> about this listing
+      </p>
+
+      <!-- Listing pill -->
+      <div style="background:#fdf6ee; border:1px solid #f4d4a8; border-radius:10px;
+                  padding:10px 14px; margin-bottom:16px; font-size:12px; color:#92400e;">
+        📦 "<%= product.title %>"
+        — <%= product.type === 'rent' ? 'Rental' : 'Purchase' %> listing
+      </div>
+
+      <!-- Email Button -->
+      <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>&body=Hi <%= product.owner.username %>,%0A%0AI'm interested in your listing '<%= product.title %>' on Home Harmony.%0A%0APlease let me know if it's still available.%0A%0AThanks"
+         style="display:flex; align-items:center; justify-content:center; gap:8px;
+                width:100%; background:#dc7420; color:#fff; font-weight:600;
+                padding:12px; border-radius:12px; text-decoration:none;
+                font-size:14px; margin-bottom:8px; box-sizing:border-box;"
+         onmouseover="this.style.background='#ce5c18'"
+         onmouseout="this.style.background='#dc7420'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+             style="width:16px; height:16px; flex-shrink:0;">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        Send Email to Seller
+      </a>
+
+      <button onclick="closeContactModal()"
+              style="width:100%; padding:10px; background:none; border:none;
+                     font-size:13px; color:#a8a29e; cursor:pointer;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showContactModal() {
+    document.getElementById('contact-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeContactModal() {
+    document.getElementById('contact-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('contact-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeContactModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeContactModal();
+  });
+</script>
+<% } %>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--  Delete Confirmation Modal                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="delete-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:999999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);">
+  <div style="display:flex; align-items:center; justify-content:center;
+              width:100%; height:100%; padding:16px; box-sizing:border-box;">
+    <div style="background:#fff; border-radius:16px; padding:28px; max-width:380px;
+                width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative;
+                box-sizing:border-box; text-align:center;">
+
+      <!-- Red warning icon -->
+      <div style="width:52px; height:52px; background:#fef2f2; border-radius:50%;
+                  display:flex; align-items:center; justify-content:center;
+                  margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"
+             style="width:24px; height:24px;">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <h3 style="font-size:17px; font-weight:700; color:#1c1917; margin:0 0 8px;">
+        Delete this listing?
+      </h3>
+      <p style="font-size:13px; color:#78716c; margin:0 0 24px; line-height:1.6;">
+        This will permanently remove <strong style="color:#292524;">"<%= product.title %>"</strong>
+        and all its images. This action cannot be undone.
+      </p>
+
+      <!-- Buttons -->
+      <div style="display:flex; gap:10px;">
+        <button onclick="closeDeleteModal()"
+                style="flex:1; padding:11px; border-radius:12px; border:1.5px solid #e7e5e4;
+                       background:#fff; font-size:14px; font-weight:500; color:#78716c;
+                       cursor:pointer; transition:background 0.15s;"
+                onmouseover="this.style.background='#f5f5f4'"
+                onmouseout="this.style.background='#fff'">
+          Cancel
+        </button>
+        <button onclick="confirmDelete()"
+                style="flex:1; padding:11px; border-radius:12px; border:none;
+                       background:#ef4444; font-size:14px; font-weight:600; color:#fff;
+                       cursor:pointer; transition:background 0.15s;"
+                onmouseover="this.style.background='#dc2626'"
+                onmouseout="this.style.background='#ef4444'">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmDelete() {
+    document.getElementById('delete-listing-form').submit();
+  }
+  document.getElementById('delete-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDeleteModal();
+  });
+</script>
