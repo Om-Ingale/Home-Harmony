@@ -102,6 +102,17 @@ app.use("/admin", adminRoutes);
 app.use("/orders", orderRoutes);
 app.use("/address", addressRoutes);
 
+// TEMP — test email route (remove after testing)
+app.get("/test-email", async (req, res) => {
+  try {
+    const { sendOtpEmail } = require("./utils/mailer");
+    await sendOtpEmail("omingale11042006@gmail.com", "123456");
+    res.send("✅ Test email sent! Check your inbox.");
+  } catch (e) {
+    res.send("❌ Email failed: " + e.message);
+  }
+});
+
 // ─── 404 Handler ─────────────────────────────
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
@@ -117,3 +128,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Home Harmony running at http://localhost:${PORT}`);
 });
+

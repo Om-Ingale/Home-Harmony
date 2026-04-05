@@ -2,20 +2,57 @@
 
 <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 
-  <!-- Success Banner -->
-  <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 text-center">
-    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"
-           class="w-8 h-8">
-        <path d="M20 6L9 17l-5-5"/>
-      </svg>
+  <!-- ── Dynamic Status Banner ─────────────────────────────────────────────── -->
+  <% if (order.status === 'cancelled') { %>
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 text-center">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" class="w-8 h-8">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M15 9l-6 6M9 9l6 6"/>
+        </svg>
+      </div>
+      <h1 class="font-display text-2xl font-bold text-red-800 mb-1">Order Cancelled</h1>
+      <p class="text-red-600 text-sm">
+        Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
+        has been cancelled. Your product is now available again.
+      </p>
     </div>
-    <h1 class="font-display text-2xl font-bold text-emerald-800 mb-1">Order Confirmed!</h1>
-    <p class="text-emerald-600 text-sm">
-      Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
-      · A confirmation email has been sent to you.
-    </p>
-  </div>
+  <% } else if (order.status === 'delivered') { %>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 text-center">
+      <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-3xl">📦</span>
+      </div>
+      <h1 class="font-display text-2xl font-bold text-emerald-800 mb-1">Order Delivered!</h1>
+      <p class="text-emerald-600 text-sm">
+        Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
+        has been delivered successfully.
+      </p>
+    </div>
+  <% } else if (order.status === 'in_transit') { %>
+    <div class="bg-purple-50 border border-purple-200 rounded-2xl p-6 mb-8 text-center">
+      <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-3xl">🚚</span>
+      </div>
+      <h1 class="font-display text-2xl font-bold text-purple-800 mb-1">Order In Transit</h1>
+      <p class="text-purple-600 text-sm">
+        Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
+        is on its way to you!
+      </p>
+    </div>
+  <% } else { %>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 text-center">
+      <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" class="w-8 h-8">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <h1 class="font-display text-2xl font-bold text-emerald-800 mb-1">Order Confirmed!</h1>
+      <p class="text-emerald-600 text-sm">
+        Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
+        · A confirmation email has been sent to you.
+      </p>
+    </div>
+  <% } %>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
@@ -57,6 +94,29 @@
             <span class="font-semibold text-stone-800"><%= order.totalDays %> days</span>
           </div>
         <% } %>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Status</span>
+          <%
+            const statusStyle = {
+              pending:    'bg-amber-100 text-amber-700',
+              confirmed:  'bg-blue-100 text-blue-700',
+              in_transit: 'bg-purple-100 text-purple-700',
+              delivered:  'bg-emerald-100 text-emerald-700',
+              cancelled:  'bg-red-100 text-red-700',
+            };
+            const statusLabel = {
+              pending:    '⏳ Pending',
+              confirmed:  '✅ Confirmed',
+              in_transit: '🚚 In Transit',
+              delivered:  '📦 Delivered',
+              cancelled:  '❌ Cancelled',
+            };
+          %>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full
+                       <%= statusStyle[order.status] || 'bg-stone-100 text-stone-600' %>">
+            <%= statusLabel[order.status] || order.status %>
+          </span>
+        </div>
         <div class="flex justify-between pt-2 border-t border-stone-100">
           <span class="text-stone-500">Total Paid</span>
           <span class="font-bold text-brand-600 text-base">
@@ -81,6 +141,7 @@
   </div>
 
   <!-- ── Tracking Timeline ─────────────────────────────────────────────────── -->
+  <% if (order.status !== 'cancelled') { %>
   <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 mb-8">
     <h2 class="font-semibold text-stone-900 mb-6 flex items-center gap-2">
       <i data-lucide="truck" class="w-4 h-4 text-brand-500"></i> Order Tracking
@@ -89,15 +150,15 @@
     <%
       const allStatuses = ['confirmed', 'in_transit', 'delivered'];
       const statusInfo  = {
-        confirmed:  { label: 'Order Confirmed',  icon: '✅', desc: 'Your order has been placed and confirmed.' },
-        in_transit: { label: 'In Transit',        icon: '🚚', desc: 'Your order is on its way to you.' },
-        delivered:  { label: 'Delivered',         icon: '📦', desc: 'Your order has been delivered.' },
+        confirmed:  { label: 'Order Confirmed', icon: '✅', desc: 'Your order has been placed and confirmed.' },
+        in_transit: { label: 'In Transit',       icon: '🚚', desc: 'Your order is on its way to you.' },
+        delivered:  { label: 'Delivered',        icon: '📦', desc: 'Your order has been delivered successfully.' },
       };
       const currentIndex = allStatuses.indexOf(order.status);
     %>
 
     <div class="relative">
-      <!-- Vertical line -->
+      <!-- Vertical connecting line -->
       <div class="absolute left-5 top-5 bottom-5 w-0.5 bg-stone-200"></div>
 
       <div class="space-y-6">
@@ -107,10 +168,10 @@
           const info      = statusInfo[status];
         %>
           <div class="flex items-start gap-4 relative">
-            <!-- Circle -->
+            <!-- Circle indicator -->
             <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                        z-10 text-base
-                        <%= isDone ? 'bg-brand-500' : 'bg-stone-100 border-2 border-stone-200' %>">
+                        z-10 text-base transition-all
+                        <%= isDone ? 'bg-brand-500 shadow-md shadow-brand-200' : 'bg-stone-100 border-2 border-stone-200' %>">
               <% if (isDone) { %>
                 <%= info.icon %>
               <% } else { %>
@@ -119,15 +180,18 @@
             </div>
 
             <!-- Content -->
-            <div class="flex-1 pb-2">
-              <p class="font-semibold text-sm
-                         <%= isDone ? 'text-stone-900' : 'text-stone-400' %>">
-                <%= info.label %>
+            <div class="flex-1 pb-2 pt-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <p class="font-semibold text-sm <%= isDone ? 'text-stone-900' : 'text-stone-400' %>">
+                  <%= info.label %>
+                </p>
                 <% if (isCurrent) { %>
-                  <span class="ml-2 text-xs bg-brand-100 text-brand-700
-                               px-2 py-0.5 rounded-full font-medium">Current</span>
+                  <span class="text-xs bg-brand-100 text-brand-700
+                               px-2 py-0.5 rounded-full font-medium">
+                    Current
+                  </span>
                 <% } %>
-              </p>
+              </div>
               <p class="text-xs mt-0.5 <%= isDone ? 'text-stone-500' : 'text-stone-300' %>">
                 <%= info.desc %>
               </p>
@@ -145,23 +209,131 @@
       </div>
     </div>
   </div>
+  <% } else { %>
+    <!-- Cancelled notice instead of tracking -->
+    <div class="bg-red-50 border border-red-100 rounded-2xl p-5 mb-8 flex items-center gap-4">
+      <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="w-5 h-5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M15 9l-6 6M9 9l6 6"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-semibold text-red-800 text-sm">This order was cancelled</p>
+        <p class="text-red-500 text-xs mt-0.5">
+          The product has been made available again for others to order.
+        </p>
+      </div>
+    </div>
+  <% } %>
 
-  <!-- Actions -->
+  <!-- ── Actions ───────────────────────────────────────────────────────────── -->
   <div class="flex flex-wrap gap-3">
-    <a href="/orders/<%= order._id %>/receipt"
-       class="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white
-              font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
-      <i data-lucide="download" class="w-4 h-4"></i> Download Receipt
-    </a>
+
+    <% if (order.status !== 'cancelled') { %>
+      <a href="/orders/<%= order._id %>/receipt"
+         class="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white
+                font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+        <i data-lucide="download" class="w-4 h-4"></i> Download Receipt
+      </a>
+    <% } %>
+
     <a href="/orders/my-orders"
        class="flex items-center gap-2 border border-stone-200 text-stone-700
               hover:bg-stone-50 px-5 py-2.5 rounded-xl transition-colors text-sm font-medium">
       <i data-lucide="list" class="w-4 h-4"></i> My Orders
     </a>
+
     <a href="/products"
        class="flex items-center gap-2 border border-stone-200 text-stone-700
               hover:bg-stone-50 px-5 py-2.5 rounded-xl transition-colors text-sm font-medium">
       <i data-lucide="shopping-bag" class="w-4 h-4"></i> Continue Browsing
     </a>
+
+    <!-- Cancel button — only if cancellable -->
+    <% if (order.status !== 'delivered' && order.status !== 'cancelled' &&
+           currentUser && order.buyer._id.equals(currentUser._id)) { %>
+      <button onclick="showCancelModal()"
+              class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600
+                     hover:bg-red-100 px-5 py-2.5 rounded-xl transition-colors text-sm font-medium">
+        <i data-lucide="x-circle" class="w-4 h-4"></i> Cancel Order
+      </button>
+    <% } %>
+  </div>
+
+</div>
+
+<!-- ── Cancel Confirmation Modal ─────────────────────────────────────────────── -->
+<% if (order.status !== 'delivered' && order.status !== 'cancelled' &&
+       currentUser && order.buyer._id.equals(currentUser._id)) { %>
+<div id="cancel-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:999999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);">
+  <div style="display:flex; align-items:center; justify-content:center;
+              width:100%; height:100%; padding:16px; box-sizing:border-box;">
+    <div style="background:#fff; border-radius:16px; padding:28px; max-width:380px;
+                width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3);
+                position:relative; box-sizing:border-box; text-align:center;">
+
+      <div style="width:52px; height:52px; background:#fef2f2; border-radius:50%;
+                  display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"
+             style="width:24px; height:24px;">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M15 9l-6 6M9 9l6 6"/>
+        </svg>
+      </div>
+
+      <h3 style="font-size:17px; font-weight:700; color:#1c1917; margin:0 0 8px;">
+        Cancel this order?
+      </h3>
+      <p style="font-size:13px; color:#78716c; margin:0 0 24px; line-height:1.6;">
+        Are you sure you want to cancel order
+        <strong style="color:#292524;">
+          #<%= order._id.toString().slice(-8).toUpperCase() %>
+        </strong>?
+        This action cannot be undone.
+      </p>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="closeCancelModal()"
+                style="flex:1; padding:11px; border-radius:12px; border:1.5px solid #e7e5e4;
+                       background:#fff; font-size:14px; font-weight:500; color:#78716c;
+                       cursor:pointer;"
+                onmouseover="this.style.background='#f5f5f4'"
+                onmouseout="this.style.background='#fff'">
+          Keep Order
+        </button>
+        <form action="/orders/<%= order._id %>/cancel?_method=PATCH" method="POST"
+              style="flex:1;">
+          <button type="submit"
+                  style="width:100%; padding:11px; border-radius:12px; border:none;
+                         background:#ef4444; font-size:14px; font-weight:600; color:#fff;
+                         cursor:pointer;"
+                  onmouseover="this.style.background='#dc2626'"
+                  onmouseout="this.style.background='#ef4444'">
+            Yes, Cancel
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  function showCancelModal() {
+    document.getElementById('cancel-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCancelModal() {
+    document.getElementById('cancel-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('cancel-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCancelModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeCancelModal();
+  });
+</script>
+<% } %>

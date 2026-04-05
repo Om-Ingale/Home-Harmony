@@ -11,11 +11,10 @@ const otpTokenSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    expiresAt: {
+    createdAt: {
         type: Date,
-        required: true,
-        // TTL index — MongoDB auto-deletes document when expiresAt is reached
-        index: { expires: 0 },
+        default: Date.now,
+        expires: 600, // TTL — MongoDB auto-deletes after 600 seconds (10 mins)
     },
 });
 

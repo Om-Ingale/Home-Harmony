@@ -1,15 +1,26 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host:   process.env.BREVO_SMTP_HOST,
-  port:   Number(process.env.BREVO_SMTP_PORT) || 587,
+  host: process.env.BREVO_SMTP_HOST,
+  port: Number(process.env.BREVO_SMTP_PORT) || 587,
   secure: false,
   auth: {
     user: process.env.BREVO_SMTP_USER,
     pass: process.env.BREVO_SMTP_PASS,
   },
+  tls: {
+    rejectUnauthorized: false, // fixes SSL issues in dev
+  },
 });
 
+// Verify connection on startup
+transporter.verify((error) => {
+  if (error) {
+    console.error("❌ Mailer connection failed:", error.message);
+  } else {
+    console.log("✅ Mailer ready — Brevo SMTP connected");
+  }
+});
 // ── Base email sender ─────────────────────────────────────────────────────────
 const sendMail = async ({ to, subject, html, attachments = [] }) => {
   await transporter.sendMail({
@@ -92,7 +103,7 @@ const sendOrderConfirmation = async (order, buyer, product, address, pdfBuffer) 
     attachments: [
       {
         filename: `receipt-${order._id.toString().slice(-8).toUpperCase()}.pdf`,
-        content:  pdfBuffer,
+        content: pdfBuffer,
         contentType: "application/pdf",
       },
     ],
@@ -136,10 +147,10 @@ const sendSellerNotification = async (order, seller, buyer, product) => {
 // ── Order status update to buyer ──────────────────────────────────────────────
 const sendStatusUpdate = async (order, buyer, product) => {
   const statusMessages = {
-    confirmed:  { emoji: "✅", text: "Your order has been confirmed!" },
+    confirmed: { emoji: "✅", text: "Your order has been confirmed!" },
     in_transit: { emoji: "🚚", text: "Your order is on its way!" },
-    delivered:  { emoji: "📦", text: "Your order has been delivered!" },
-    cancelled:  { emoji: "❌", text: "Your order has been cancelled." },
+    delivered: { emoji: "📦", text: "Your order has been delivered!" },
+    cancelled: { emoji: "❌", text: "Your order has been cancelled." },
   };
 
   const msg = statusMessages[order.status] || { emoji: "📋", text: "Your order status has been updated." };

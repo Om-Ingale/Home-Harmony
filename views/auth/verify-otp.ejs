@@ -1,0 +1,187 @@
+<%- layout('boilerplate') %>
+
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#dc7420" stroke-width="2"
+             class="w-7 h-7">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+      </div>
+      <h1 class="font-display text-3xl font-bold text-stone-900">Check your email</h1>
+      <p class="text-stone-500 mt-2 text-sm">
+        We sent a 6-digit OTP to
+      </p>
+      <p class="text-brand-600 font-semibold text-sm mt-1"><%= email %></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8">
+
+      <form action="/auth/verify-otp" method="POST" class="space-y-6">
+
+        <!-- OTP Input -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 mb-3 text-center">
+            Enter your 6-digit OTP
+          </label>
+
+          <!-- Individual digit boxes -->
+          <div class="flex gap-2 justify-center" id="otp-boxes">
+            <% for(let i = 0; i < 6; i++) { %>
+              <input type="text"
+                     maxlength="1"
+                     inputmode="numeric"
+                     pattern="\d"
+                     id="otp-<%= i %>"
+                     class="w-11 h-14 text-center text-xl font-bold border-2 border-stone-200
+                            rounded-xl focus:outline-none focus:border-brand-500
+                            focus:ring-2 focus:ring-brand-100 transition-all text-stone-900
+                            caret-transparent"
+                     autocomplete="off" />
+            <% } %>
+          </div>
+
+          <!-- Hidden input that holds the combined OTP value -->
+          <input type="hidden" name="otp" id="otp-combined" />
+        </div>
+
+        <!-- Timer -->
+        <div class="text-center">
+          <p class="text-xs text-stone-400" id="timer-text">
+            OTP expires in <span id="countdown" class="font-semibold text-stone-600">10:00</span>
+          </p>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="verify-btn"
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold
+                       py-3 rounded-xl transition-colors shadow-sm">
+          Verify OTP
+        </button>
+
+      </form>
+
+      <!-- Resend -->
+      <div class="mt-5 text-center space-y-2">
+        <p class="text-sm text-stone-400">Didn't receive the code?</p>
+        <a href="/auth/forgot-password"
+           class="text-sm text-brand-500 hover:text-brand-600 font-medium hover:underline">
+          Resend OTP
+        </a>
+      </div>
+
+      <!-- Back to login -->
+      <div class="mt-4 text-center">
+        <a href="/auth/login"
+           class="text-xs text-stone-400 hover:text-stone-600 transition-colors">
+          ← Back to Sign In
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── OTP box auto-focus logic ───────────────────────────────────────────────
+  const boxes    = Array.from({ length: 6 }, (_, i) => document.getElementById('otp-' + i));
+  const combined = document.getElementById('otp-combined');
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', (e) => {
+      // Allow only digits
+      box.value = box.value.replace(/\D/g, '').slice(-1);
+
+      // Move to next box
+      if (box.value && i < 5) {
+        boxes[i + 1].focus();
+      }
+
+      updateCombined();
+    });
+
+    box.addEventListener('keydown', (e) => {
+      // Backspace — clear current and move back
+      if (e.key === 'Backspace') {
+        if (!box.value && i > 0) {
+          boxes[i - 1].focus();
+          boxes[i - 1].value = '';
+        }
+        updateCombined();
+      }
+
+      // Arrow key navigation
+      if (e.key === 'ArrowLeft' && i > 0)  boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < 5) boxes[i + 1].focus();
+    });
+
+    // Handle paste — spread digits across boxes
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+      pasted.split('').forEach((char, j) => {
+        if (boxes[i + j]) boxes[i + j].value = char;
+      });
+      const nextEmpty = boxes.findIndex((b, j) => j >= i && !b.value);
+      if (nextEmpty !== -1) boxes[nextEmpty].focus();
+      else boxes[5].focus();
+      updateCombined();
+    });
+  });
+
+  function updateCombined() {
+    combined.value = boxes.map(b => b.value).join('');
+  }
+
+  // Auto focus first box on load
+  boxes[0].focus();
+
+  // ── Countdown timer ───────────────────────────────────────────────────────
+  let timeLeft  = 10 * 60; // 10 minutes in seconds
+  const display = document.getElementById('countdown');
+  const timerTx = document.getElementById('timer-text');
+
+  const timer = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const secs = (timeLeft % 60).toString().padStart(2, '0');
+    display.textContent = `${mins}:${secs}`;
+
+    if (timeLeft <= 60) {
+      display.classList.add('text-red-500');
+      display.classList.remove('text-stone-600');
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      timerTx.innerHTML = '<span class="text-red-500 font-medium">OTP expired. Please request a new one.</span>';
+      document.getElementById('verify-btn').disabled = true;
+      document.getElementById('verify-btn').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+  }, 1000);
+
+  // ── Form submit validation ─────────────────────────────────────────────────
+  document.querySelector('form').addEventListener('submit', (e) => {
+    updateCombined();
+    if (combined.value.length !== 6) {
+      e.preventDefault();
+      // Shake animation on boxes
+      const boxContainer = document.getElementById('otp-boxes');
+      boxContainer.style.animation = 'shake 0.4s ease';
+      setTimeout(() => { boxContainer.style.animation = ''; }, 400);
+    }
+  });
+</script>
+
+<style>
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px); }
+    60%       { transform: translateX(-5px); }
+    80%       { transform: translateX(5px); }
+  }
+</style>
