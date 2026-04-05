@@ -1,0 +1,167 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+
+  <!-- Success Banner -->
+  <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 text-center">
+    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"
+           class="w-8 h-8">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+    <h1 class="font-display text-2xl font-bold text-emerald-800 mb-1">Order Confirmed!</h1>
+    <p class="text-emerald-600 text-sm">
+      Order #<strong><%= order._id.toString().slice(-8).toUpperCase() %></strong>
+      · A confirmation email has been sent to you.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+    <!-- Order Details -->
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+      <h2 class="font-semibold text-stone-900 mb-4 flex items-center gap-2">
+        <i data-lucide="package" class="w-4 h-4 text-brand-500"></i> Order Details
+      </h2>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between">
+          <span class="text-stone-500">Order ID</span>
+          <span class="font-semibold text-stone-800">
+            #<%= order._id.toString().slice(-8).toUpperCase() %>
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Product</span>
+          <span class="font-semibold text-stone-800"><%= order.product.title %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Type</span>
+          <span class="font-semibold text-stone-800 capitalize"><%= order.type %></span>
+        </div>
+        <% if (order.type === 'rent') { %>
+          <div class="flex justify-between">
+            <span class="text-stone-500">Start Date</span>
+            <span class="font-semibold text-stone-800">
+              <%= new Date(order.startDate).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) %>
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-500">End Date</span>
+            <span class="font-semibold text-stone-800">
+              <%= new Date(order.endDate).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) %>
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-500">Duration</span>
+            <span class="font-semibold text-stone-800"><%= order.totalDays %> days</span>
+          </div>
+        <% } %>
+        <div class="flex justify-between pt-2 border-t border-stone-100">
+          <span class="text-stone-500">Total Paid</span>
+          <span class="font-bold text-brand-600 text-base">
+            ₹<%= order.totalAmount.toLocaleString('en-IN') %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Address -->
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+      <h2 class="font-semibold text-stone-900 mb-4 flex items-center gap-2">
+        <i data-lucide="map-pin" class="w-4 h-4 text-brand-500"></i> Delivery Address
+      </h2>
+      <div class="text-sm text-stone-600 space-y-1">
+        <p class="font-semibold text-stone-800"><%= order.address.fullName %></p>
+        <p><%= order.address.line1 %><% if (order.address.line2) { %>, <%= order.address.line2 %><% } %></p>
+        <p><%= order.address.city %>, <%= order.address.state %> — <%= order.address.pincode %></p>
+        <p class="text-stone-400">📞 <%= order.address.phone %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tracking Timeline ─────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 mb-8">
+    <h2 class="font-semibold text-stone-900 mb-6 flex items-center gap-2">
+      <i data-lucide="truck" class="w-4 h-4 text-brand-500"></i> Order Tracking
+    </h2>
+
+    <%
+      const allStatuses = ['confirmed', 'in_transit', 'delivered'];
+      const statusInfo  = {
+        confirmed:  { label: 'Order Confirmed',  icon: '✅', desc: 'Your order has been placed and confirmed.' },
+        in_transit: { label: 'In Transit',        icon: '🚚', desc: 'Your order is on its way to you.' },
+        delivered:  { label: 'Delivered',         icon: '📦', desc: 'Your order has been delivered.' },
+      };
+      const currentIndex = allStatuses.indexOf(order.status);
+    %>
+
+    <div class="relative">
+      <!-- Vertical line -->
+      <div class="absolute left-5 top-5 bottom-5 w-0.5 bg-stone-200"></div>
+
+      <div class="space-y-6">
+        <% allStatuses.forEach((status, i) => {
+          const isDone    = i <= currentIndex;
+          const isCurrent = i === currentIndex;
+          const info      = statusInfo[status];
+        %>
+          <div class="flex items-start gap-4 relative">
+            <!-- Circle -->
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                        z-10 text-base
+                        <%= isDone ? 'bg-brand-500' : 'bg-stone-100 border-2 border-stone-200' %>">
+              <% if (isDone) { %>
+                <%= info.icon %>
+              <% } else { %>
+                <div class="w-2 h-2 rounded-full bg-stone-300"></div>
+              <% } %>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 pb-2">
+              <p class="font-semibold text-sm
+                         <%= isDone ? 'text-stone-900' : 'text-stone-400' %>">
+                <%= info.label %>
+                <% if (isCurrent) { %>
+                  <span class="ml-2 text-xs bg-brand-100 text-brand-700
+                               px-2 py-0.5 rounded-full font-medium">Current</span>
+                <% } %>
+              </p>
+              <p class="text-xs mt-0.5 <%= isDone ? 'text-stone-500' : 'text-stone-300' %>">
+                <%= info.desc %>
+              </p>
+              <% if (isDone && status === order.status) { %>
+                <p class="text-xs text-stone-400 mt-1">
+                  <%= new Date(order.updatedAt).toLocaleDateString('en-IN', {
+                    day:'numeric', month:'short', year:'numeric',
+                    hour:'2-digit', minute:'2-digit'
+                  }) %>
+                </p>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex flex-wrap gap-3">
+    <a href="/orders/<%= order._id %>/receipt"
+       class="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white
+              font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+      <i data-lucide="download" class="w-4 h-4"></i> Download Receipt
+    </a>
+    <a href="/orders/my-orders"
+       class="flex items-center gap-2 border border-stone-200 text-stone-700
+              hover:bg-stone-50 px-5 py-2.5 rounded-xl transition-colors text-sm font-medium">
+      <i data-lucide="list" class="w-4 h-4"></i> My Orders
+    </a>
+    <a href="/products"
+       class="flex items-center gap-2 border border-stone-200 text-stone-700
+              hover:bg-stone-50 px-5 py-2.5 rounded-xl transition-colors text-sm font-medium">
+      <i data-lucide="shopping-bag" class="w-4 h-4"></i> Continue Browsing
+    </a>
+  </div>
+</div>

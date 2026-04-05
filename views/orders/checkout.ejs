@@ -1,0 +1,789 @@
+<%- layout('boilerplate') %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+
+  <!-- Page Header -->
+  <div class="mb-8">
+    <a href="/products/<%= product._id %>"
+       class="inline-flex items-center gap-1.5 text-sm text-stone-500
+              hover:text-brand-500 transition-colors mb-4">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to listing
+    </a>
+    <h1 class="font-display text-3xl font-bold text-stone-900">Checkout</h1>
+    <p class="text-stone-500 mt-1 text-sm">Complete your order in a few simple steps</p>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="flex items-center gap-0 mb-10">
+    <% const steps = product.type === 'rent'
+         ? ['Duration', 'Address', 'Summary']
+         : ['Address', 'Summary']; %>
+    <% steps.forEach((step, i) => { %>
+      <div class="flex items-center">
+        <div class="flex items-center gap-2">
+          <div id="step-indicator-<%= i %>"
+               class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
+                      transition-all <%= i === 0 ? 'bg-brand-500 text-white' : 'bg-stone-200 text-stone-500' %>">
+            <%= i + 1 %>
+          </div>
+          <span id="step-label-<%= i %>"
+                class="text-sm font-medium <%= i === 0 ? 'text-brand-600' : 'text-stone-400' %>">
+            <%= step %>
+          </span>
+        </div>
+        <% if (i < steps.length - 1) { %>
+          <div class="w-12 h-0.5 bg-stone-200 mx-3"></div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- ── Left: Step Content ──────────────────────────────────────────────── -->
+    <div class="lg:col-span-2">
+
+      <!-- ═══ STEP 1 (RENT): Duration Picker ════════════════════════════════ -->
+      <% if (product.type === 'rent') { %>
+      <div id="step-0" class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+        <h2 class="font-semibold text-stone-900 text-lg mb-1">Select Rental Duration</h2>
+        <p class="text-stone-400 text-sm mb-6">Choose your start date and number of days</p>
+
+        <div class="space-y-5">
+
+          <!-- Start Date -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-1.5">
+              Start Date <span class="text-red-400">*</span>
+            </label>
+            <input type="date" id="startDate"
+                   min="<%= new Date().toISOString().split('T')[0] %>"
+                   class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand-300"
+                   onchange="calculateTotal()" />
+          </div>
+
+          <!-- Number of days -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-1.5">
+              Number of Days <span class="text-red-400">*</span>
+            </label>
+            <div class="flex items-center gap-4">
+              <button type="button" onclick="changeDays(-1)"
+                      class="w-10 h-10 rounded-xl border border-stone-200 bg-stone-50
+                             hover:bg-stone-100 flex items-center justify-center
+                             text-stone-700 font-bold text-lg transition-colors">−</button>
+              <span id="days-display"
+                    class="text-2xl font-bold text-stone-900 w-16 text-center">7</span>
+              <button type="button" onclick="changeDays(1)"
+                      class="w-10 h-10 rounded-xl border border-stone-200 bg-stone-50
+                             hover:bg-stone-100 flex items-center justify-center
+                             text-stone-700 font-bold text-lg transition-colors">+</button>
+            </div>
+
+            <!-- Quick select buttons -->
+            <div class="flex flex-wrap gap-2 mt-4">
+              <% [[7,'1 Week'],[14,'2 Weeks'],[30,'1 Month'],[60,'2 Months'],[90,'3 Months']].forEach(([d,l]) => { %>
+                <button type="button" onclick="setDays(<%= d %>, event)"
+                        class="quick-day-btn text-xs px-3 py-1.5 rounded-full border
+                               border-stone-200 text-stone-600 hover:border-brand-400
+                               hover:text-brand-600 transition-colors">
+                  <%= l %>
+                </button>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- End date display + rate info -->
+          <div class="bg-stone-50 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-stone-400 mb-0.5">Return Date</p>
+              <p id="end-date-display" class="text-sm font-semibold text-stone-700">—</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-stone-400 mb-0.5">Monthly Rate</p>
+              <p class="text-sm font-semibold text-stone-700">
+                ₹<%= product.price.toLocaleString('en-IN') %>/month
+              </p>
+              <p class="text-xs text-stone-400 mt-0.5">
+                ≈ ₹<%= Math.round(product.price / 30).toLocaleString('en-IN') %>/day
+              </p>
+            </div>
+          </div>
+
+          <!-- Rental cost breakdown -->
+          <div id="cost-breakdown"
+               class="bg-brand-50 border border-brand-100 rounded-xl p-4 hidden">
+            <p class="text-xs font-semibold text-brand-700 mb-3 uppercase tracking-wide">
+              Cost Breakdown
+            </p>
+            <div class="space-y-1.5 text-sm">
+              <div class="flex justify-between text-stone-600">
+                <span id="breakdown-days">7 days × ₹—/day</span>
+                <span id="breakdown-subtotal">₹—</span>
+              </div>
+              <div class="flex justify-between text-stone-500 text-xs">
+                <span id="breakdown-monthly-note"></span>
+              </div>
+              <div class="flex justify-between text-stone-600">
+                <span>GST (18%)</span>
+                <span id="breakdown-tax">₹—</span>
+              </div>
+              <div class="flex justify-between font-bold text-stone-900 pt-2
+                          border-t border-brand-200 mt-2">
+                <span>Total</span>
+                <span id="breakdown-total" class="text-brand-600">₹—</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="goToStep(1)"
+                  class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold
+                         py-3 rounded-xl transition-colors shadow-sm">
+            Continue to Address →
+          </button>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- ═══ STEP 2 (both): Address Selection ══════════════════════════════ -->
+      <div id="step-<%= product.type === 'rent' ? 1 : 0 %>"
+           class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6
+                  <%= product.type === 'rent' ? 'hidden' : '' %>">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="font-semibold text-stone-900 text-lg">Delivery Address</h2>
+          <button onclick="showInlineAddressForm()"
+                  class="text-sm text-brand-500 hover:text-brand-600 flex items-center gap-1">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add New
+          </button>
+        </div>
+        <p class="text-stone-400 text-sm mb-6">Select where to deliver your order</p>
+
+        <% if (addresses.length === 0) { %>
+          <div class="text-center py-8 border-2 border-dashed border-stone-200 rounded-xl mb-4">
+            <i data-lucide="map-pin" class="w-8 h-8 text-stone-300 mx-auto mb-3"></i>
+            <p class="text-stone-700 font-medium mb-1">No saved addresses yet</p>
+            <p class="text-stone-400 text-sm mb-4">Add a delivery address to continue</p>
+            <button onclick="showInlineAddressForm()"
+                    class="bg-brand-500 hover:bg-brand-600 text-white font-semibold
+                           px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+              + Add Delivery Address
+            </button>
+          </div>
+        <% } else { %>
+          <div class="space-y-3" id="address-options">
+            <% addresses.forEach(addr => { %>
+              <label class="block cursor-pointer">
+                <input type="radio" name="selectedAddress"
+                       value="<%= addr._id %>"
+                       class="hidden peer"
+                       <%= addr.isDefault ? 'checked' : '' %>
+                       onchange="selectedAddressId = '<%= addr._id %>'" />
+                <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50
+                            border-2 border-stone-200 rounded-xl p-4 transition-all
+                            hover:border-brand-300">
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center
+                                  <%= addr.label === 'Home' ? 'bg-blue-50' : addr.label === 'Work' ? 'bg-purple-50' : 'bg-amber-50' %>">
+                        <% if (addr.label === 'Home') { %>
+                          <i data-lucide="home" class="w-4 h-4 text-blue-500"></i>
+                        <% } else if (addr.label === 'Work') { %>
+                          <i data-lucide="briefcase" class="w-4 h-4 text-purple-500"></i>
+                        <% } else { %>
+                          <i data-lucide="map-pin" class="w-4 h-4 text-amber-500"></i>
+                        <% } %>
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-semibold text-stone-800"><%= addr.label %></span>
+                          <% if (addr.isDefault) { %>
+                            <span class="text-xs bg-brand-100 text-brand-700
+                                         px-2 py-0.5 rounded-full">Default</span>
+                          <% } %>
+                        </div>
+                        <p class="text-stone-600 text-sm"><%= addr.fullName %> · <%= addr.phone %></p>
+                        <p class="text-stone-400 text-xs mt-0.5">
+                          <%= addr.line1 %><% if (addr.line2) { %>, <%= addr.line2 %><% } %>,
+                          <%= addr.city %>, <%= addr.state %> <%= addr.pincode %>
+                        </p>
+                      </div>
+                    </div>
+                    <!-- Radio indicator -->
+                    <div class="w-5 h-5 rounded-full border-2 border-stone-300
+                                peer-checked:border-brand-500 flex items-center
+                                justify-center shrink-0 mt-0.5">
+                      <div class="w-2.5 h-2.5 rounded-full bg-brand-500 hidden
+                                  peer-checked:block"></div>
+                    </div>
+                  </div>
+                </div>
+              </label>
+            <% }) %>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <% if (product.type === 'rent') { %>
+              <button onclick="goToStep(0)"
+                      class="px-6 py-3 border border-stone-200 text-stone-600 rounded-xl
+                             hover:bg-stone-50 transition-colors text-sm font-medium">
+                ← Back
+              </button>
+            <% } %>
+            <button onclick="goToSummary()"
+                    class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold
+                           py-3 rounded-xl transition-colors shadow-sm">
+              Continue to Summary →
+            </button>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- ═══ STEP 3 (both): Order Summary ══════════════════════════════════ -->
+      <div id="step-<%= product.type === 'rent' ? 2 : 1 %>"
+           class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 hidden">
+        <h2 class="font-semibold text-stone-900 text-lg mb-1">Order Summary</h2>
+        <p class="text-stone-400 text-sm mb-6">Review your order before payment</p>
+
+        <!-- Product summary -->
+        <div class="flex gap-4 mb-6 pb-6 border-b border-stone-100">
+          <img src="<%= product.images[0] ? product.images[0].url : 'https://placehold.co/100x100?text=No+Image' %>"
+               alt="<%= product.title %>"
+               class="w-20 h-20 object-cover rounded-xl border border-stone-200 shrink-0" />
+          <div>
+            <h3 class="font-semibold text-stone-900"><%= product.title %></h3>
+            <p class="text-stone-400 text-sm capitalize"><%= product.category %></p>
+            <div class="mt-2">
+              <% if (product.type === 'rent') { %>
+                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                  Rental
+                </span>
+              <% } else { %>
+                <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
+                  Purchase
+                </span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rental dates (rent only) -->
+        <% if (product.type === 'rent') { %>
+          <div class="bg-blue-50 rounded-xl p-4 mb-6 text-sm">
+            <p class="font-semibold text-blue-800 mb-2">Rental Period</p>
+            <div class="flex justify-between text-blue-700">
+              <span>Start: <span id="summary-start">—</span></span>
+              <span>End: <span id="summary-end">—</span></span>
+              <span><span id="summary-days">—</span> days</span>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Selected address summary -->
+        <div class="bg-stone-50 rounded-xl p-4 mb-6">
+          <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">
+            Delivering To
+          </p>
+          <div id="summary-address" class="text-sm text-stone-700">—</div>
+        </div>
+
+        <!-- Price breakdown -->
+        <div class="border border-stone-100 rounded-xl p-4 mb-6 space-y-2 text-sm">
+          <div class="flex justify-between text-stone-600">
+            <span id="summary-price-label">Price</span>
+            <span id="summary-subtotal">₹—</span>
+          </div>
+          <div class="flex justify-between text-stone-600">
+            <span>GST (18%)</span>
+            <span id="summary-tax">₹—</span>
+          </div>
+          <div class="flex justify-between font-bold text-stone-900 pt-2
+                      border-t border-stone-200">
+            <span>Total</span>
+            <span id="summary-total" class="text-brand-600 text-base">₹—</span>
+          </div>
+        </div>
+
+        <!-- Pay button -->
+        <div class="flex gap-3">
+          <button onclick="goToStep(<%= product.type === 'rent' ? 1 : 0 %>)"
+                  class="px-6 py-3 border border-stone-200 text-stone-600 rounded-xl
+                         hover:bg-stone-50 transition-colors text-sm font-medium">
+            ← Back
+          </button>
+          <button id="pay-btn" onclick="initiatePayment()"
+                  class="flex-1 flex items-center justify-center gap-2 bg-stone-900
+                         hover:bg-stone-800 text-white font-semibold py-3 rounded-xl
+                         transition-colors shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.5 2L19 9H14.5L12 14L9.5 9H5L9.5 2H14.5Z"/>
+            </svg>
+            Pay ₹<span id="pay-btn-amount">—</span> with Razorpay
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Right: Product Card ─────────────────────────────────────────────── -->
+    <div class="lg:col-span-1">
+      <div class="sticky top-24 bg-white rounded-2xl border border-stone-100
+                  shadow-md p-5 space-y-4">
+        <img src="<%= product.images[0] ? product.images[0].url : 'https://placehold.co/400x300?text=No+Image' %>"
+             alt="<%= product.title %>"
+             class="w-full aspect-video object-cover rounded-xl" />
+        <div>
+          <h3 class="font-semibold text-stone-900 text-sm"><%= product.title %></h3>
+          <p class="text-stone-400 text-xs capitalize mt-0.5"><%= product.category %></p>
+        </div>
+        <div class="border-t border-stone-100 pt-4">
+          <% if (product.type === 'rent') { %>
+            <p class="text-xs text-stone-400">Monthly Rate</p>
+            <p class="text-xl font-bold text-stone-900">
+              ₹<%= product.price.toLocaleString('en-IN') %>
+              <span class="text-sm font-normal text-stone-400">/month</span>
+            </p>
+            <p class="text-xs text-stone-400 mt-1">
+              ≈ ₹<%= Math.round(product.price / 30).toLocaleString('en-IN') %>/day (billed daily)
+            </p>
+          <% } else { %>
+            <p class="text-xs text-stone-400">Purchase Price</p>
+            <p class="text-xl font-bold text-stone-900">
+              ₹<%= product.price.toLocaleString('en-IN') %>
+            </p>
+          <% } %>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-stone-400">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          <%= product.city %>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-emerald-600">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          Secure Checkout
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Inline Add Address Panel ──────────────────────────────────────────── -->
+  <div id="inline-address-overlay"
+       style="display:none; position:fixed; inset:0; z-index:99999;
+              background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);">
+    <div id="inline-address-panel"
+         style="position:fixed; right:0; top:0; height:100%; width:100%;
+                max-width:480px; background:#fff; overflow-y:auto;
+                box-shadow:-8px 0 40px rgba(0,0,0,0.15);
+                transform:translateX(100%); transition:transform 0.3s ease;">
+
+      <div style="padding:28px;">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+          <div>
+            <h2 style="font-size:18px; font-weight:700; color:#1c1917; margin:0;">Add Delivery Address</h2>
+            <p style="font-size:13px; color:#78716c; margin:4px 0 0;">Saved and used for this order</p>
+          </div>
+          <button onclick="hideInlineAddressForm()"
+                  style="width:32px; height:32px; border-radius:50%; background:#f5f5f4;
+                         border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2.5"
+                 style="width:14px; height:14px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Form posts to /address with redirect back to checkout -->
+        <form action="/address?redirect=/orders/checkout/<%= product._id %>" method="POST" class="space-y-4">
+
+          <!-- Label -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-2">Address Type</label>
+            <div class="flex gap-3">
+              <% ['Home','Work','Other'].forEach(l => { %>
+                <label class="flex-1 cursor-pointer">
+                  <input type="radio" name="label" value="<%= l %>"
+                         class="hidden peer" <%= l === 'Home' ? 'checked' : '' %> />
+                  <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50
+                              peer-checked:text-brand-700 border-2 border-stone-200
+                              rounded-xl py-2 text-center text-sm font-medium
+                              text-stone-600 transition-all">
+                    <%= l === 'Home' ? '🏠' : l === 'Work' ? '💼' : '📍' %> <%= l %>
+                  </div>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Full Name + Phone -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Full Name *</label>
+              <input type="text" name="fullName" required placeholder="Rahul Sharma"
+                     class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-brand-300" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Phone *</label>
+              <input type="tel" name="phone" required placeholder="9876543210" maxlength="10"
+                     class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-brand-300" />
+            </div>
+          </div>
+
+          <!-- Line 1 -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-1.5">House / Flat / Building *</label>
+            <input type="text" name="line1" required placeholder="Flat 4B, Sunrise Apartments"
+                   class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand-300" />
+          </div>
+
+          <!-- Line 2 -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-1.5">
+              Street / Area <span class="text-stone-400 font-normal">(optional)</span>
+            </label>
+            <input type="text" name="line2" placeholder="MG Road, Koregaon Park"
+                   class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand-300" />
+          </div>
+
+          <!-- City + State -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">City *</label>
+              <input type="text" name="city" required placeholder="Pune"
+                     class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-brand-300" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">State *</label>
+              <select name="state" required
+                      class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                             focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+                <option value="" disabled selected>Select state</option>
+                <% ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
+                    'Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka',
+                    'Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram',
+                    'Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana',
+                    'Tripura','Uttar Pradesh','Uttarakhand','West Bengal',
+                    'Delhi','Jammu & Kashmir','Ladakh'].forEach(s => { %>
+                  <option value="<%= s %>"><%= s %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <!-- Pincode -->
+          <div>
+            <label class="block text-sm font-medium text-stone-700 mb-1.5">Pincode *</label>
+            <input type="text" name="pincode" required placeholder="411001"
+                   maxlength="6" pattern="\d{6}"
+                   class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-brand-300" />
+          </div>
+
+          <!-- Default -->
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="isDefault" checked
+                   class="w-4 h-4 rounded accent-orange-500" />
+            <span class="text-sm text-stone-700">Set as default address</span>
+          </label>
+
+          <button type="submit"
+                  class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold
+                         py-3 rounded-xl transition-colors shadow-sm text-sm">
+            Save & Continue to Order →
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+  // ── Constants from server ──────────────────────────────────────────────────
+  const PRODUCT_TYPE   = '<%= product.type %>';
+  const PRODUCT_PRICE  = <%= product.price %>;
+  const MONTHLY_RATE   = <%= product.price %>;
+  const DAILY_RATE     = Math.round(<%= product.price %> / 30);
+  const PRODUCT_ID     = '<%= product._id %>';
+  const PRODUCT_TITLE  = '<%= product.title.replace(/'/g, "\\'") %>';
+  const RAZORPAY_KEY   = '<%= razorpayKey %>';
+  const USER_NAME      = '<%= currentUser.username.replace(/'/g, "\\'") %>';
+  const USER_EMAIL     = '<%= currentUser.email %>';
+  const IS_RENT        = PRODUCT_TYPE === 'rent';
+
+  // ── Addresses data ─────────────────────────────────────────────────────────
+  const addressesData = <%- JSON.stringify(addresses) %>;
+  let selectedAddressId = '<%= addresses.find(a => a.isDefault)?._id || addresses[0]?._id || "" %>';
+
+  // ── Rental state ───────────────────────────────────────────────────────────
+  let rentalDays  = 7;
+  let startDate   = null;
+  let totalAmount = 0;
+
+  // ── Step navigation ────────────────────────────────────────────────────────
+  const totalSteps = IS_RENT ? 3 : 2;
+  let currentStep  = 0;
+
+  function goToStep(step) {
+    if (IS_RENT && currentStep === 0 && step > 0) {
+      if (!document.getElementById('startDate').value) {
+        alert('Please select a start date.');
+        return;
+      }
+    }
+
+    document.getElementById('step-' + currentStep).classList.add('hidden');
+    document.getElementById('step-' + step).classList.remove('hidden');
+
+    for (let i = 0; i < totalSteps; i++) {
+      const ind = document.getElementById('step-indicator-' + i);
+      const lbl = document.getElementById('step-label-' + i);
+      if (i < step) {
+        ind.className = ind.className
+          .replace('bg-brand-500 text-white', '')
+          .replace('bg-stone-200 text-stone-500', '');
+        ind.classList.add('bg-emerald-500', 'text-white');
+        ind.innerHTML = '✓';
+      } else if (i === step) {
+        ind.className = ind.className
+          .replace('bg-stone-200 text-stone-500', '')
+          .replace('bg-emerald-500 text-white', '');
+        ind.classList.add('bg-brand-500', 'text-white');
+        ind.innerHTML = i + 1;
+        lbl.classList.remove('text-stone-400');
+        lbl.classList.add('text-brand-600');
+      } else {
+        ind.innerHTML = i + 1;
+      }
+    }
+    currentStep = step;
+  }
+
+  function goToSummary() {
+    if (!selectedAddressId) {
+      alert('Please select a delivery address.');
+      return;
+    }
+
+    const summaryStep = IS_RENT ? 2 : 1;
+
+    // Fill address in summary
+    const addr = addressesData.find(a => a._id === selectedAddressId);
+    if (addr) {
+      document.getElementById('summary-address').innerHTML = `
+        <strong>${addr.fullName}</strong> · ${addr.phone}<br/>
+        ${addr.line1}${addr.line2 ? ', ' + addr.line2 : ''}<br/>
+        ${addr.city}, ${addr.state} — ${addr.pincode}
+      `;
+    }
+
+    if (IS_RENT) {
+      const subtotal = rentalDays * DAILY_RATE;
+      const tax      = Math.round(subtotal * 0.18);
+      totalAmount    = subtotal + tax;
+
+      const sd = new Date(document.getElementById('startDate').value);
+      const ed = new Date(sd);
+      ed.setDate(ed.getDate() + rentalDays);
+
+      document.getElementById('summary-start').textContent =
+        sd.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      document.getElementById('summary-end').textContent =
+        ed.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      document.getElementById('summary-days').textContent = rentalDays;
+
+      // Show "X days × ₹Y/day (≈ ₹Z/month)"
+      document.getElementById('summary-price-label').textContent =
+        `${rentalDays} days × ₹${DAILY_RATE.toLocaleString('en-IN')}/day`;
+      document.getElementById('summary-subtotal').textContent =
+        `₹${subtotal.toLocaleString('en-IN')}`;
+      document.getElementById('summary-tax').textContent =
+        `₹${tax.toLocaleString('en-IN')}`;
+      document.getElementById('summary-total').textContent =
+        `₹${totalAmount.toLocaleString('en-IN')}`;
+      document.getElementById('pay-btn-amount').textContent =
+        totalAmount.toLocaleString('en-IN');
+    } else {
+      const subtotal = PRODUCT_PRICE;
+      const tax      = Math.round(subtotal * 0.18);
+      totalAmount    = subtotal + tax;
+
+      document.getElementById('summary-price-label').textContent = 'Product Price';
+      document.getElementById('summary-subtotal').textContent =
+        `₹${subtotal.toLocaleString('en-IN')}`;
+      document.getElementById('summary-tax').textContent =
+        `₹${tax.toLocaleString('en-IN')}`;
+      document.getElementById('summary-total').textContent =
+        `₹${totalAmount.toLocaleString('en-IN')}`;
+      document.getElementById('pay-btn-amount').textContent =
+        totalAmount.toLocaleString('en-IN');
+    }
+
+    goToStep(summaryStep);
+  }
+
+  // ── Rental calculator ──────────────────────────────────────────────────────
+  function changeDays(delta) {
+    rentalDays = Math.max(1, Math.min(365, rentalDays + delta));
+    document.getElementById('days-display').textContent = rentalDays;
+    calculateTotal();
+  }
+
+  function setDays(d, e) {
+    rentalDays = d;
+    document.getElementById('days-display').textContent = d;
+    document.querySelectorAll('.quick-day-btn').forEach(btn => {
+      btn.classList.remove('border-brand-400', 'text-brand-600', 'bg-brand-50');
+    });
+    if (e && e.target) {
+      e.target.classList.add('border-brand-400', 'text-brand-600', 'bg-brand-50');
+    }
+    calculateTotal();
+  }
+
+  function calculateTotal() {
+    const dateVal = document.getElementById('startDate').value;
+    if (!dateVal) return;
+
+    startDate = new Date(dateVal);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + rentalDays);
+
+    document.getElementById('end-date-display').textContent =
+      endDate.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+    const subtotal = rentalDays * DAILY_RATE;
+    const tax      = Math.round(subtotal * 0.18);
+    totalAmount    = subtotal + tax;
+
+    // Breakdown label — show days × daily rate
+    document.getElementById('breakdown-days').textContent =
+      `${rentalDays} days × ₹${DAILY_RATE.toLocaleString('en-IN')}/day`;
+
+    // Monthly equivalent note
+    const monthlyNote = document.getElementById('breakdown-monthly-note');
+    if (monthlyNote) {
+      monthlyNote.textContent =
+        `(Monthly rate: ₹${MONTHLY_RATE.toLocaleString('en-IN')}/month)`;
+    }
+
+    document.getElementById('breakdown-subtotal').textContent =
+      `₹${subtotal.toLocaleString('en-IN')}`;
+    document.getElementById('breakdown-tax').textContent =
+      `₹${tax.toLocaleString('en-IN')}`;
+    document.getElementById('breakdown-total').textContent =
+      `₹${totalAmount.toLocaleString('en-IN')}`;
+
+    document.getElementById('cost-breakdown').classList.remove('hidden');
+  }
+
+  // ── Razorpay payment ───────────────────────────────────────────────────────
+  async function initiatePayment() {
+    const btn = document.getElementById('pay-btn');
+    const originalHTML = btn.innerHTML;
+    btn.disabled  = true;
+    btn.innerHTML = '<svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Processing...';
+
+    try {
+      const res = await fetch('/payment/create-order', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount:       totalAmount,
+          productId:    PRODUCT_ID,
+          productTitle: PRODUCT_TITLE,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error('Could not create order.');
+
+      const orderMeta = {
+        productId:   PRODUCT_ID,
+        addressId:   selectedAddressId,
+        type:        PRODUCT_TYPE,
+        totalAmount,
+        ...(IS_RENT && {
+          startDate: document.getElementById('startDate').value,
+          totalDays: rentalDays,
+        }),
+      };
+
+      const options = {
+        key:         RAZORPAY_KEY,
+        amount:      data.order.amount,
+        currency:    'INR',
+        name:        'Home Harmony',
+        description: PRODUCT_TITLE,
+        order_id:    data.order.id,
+        prefill:     { name: USER_NAME, email: USER_EMAIL },
+        theme:       { color: '#dc7420' },
+
+        handler: async function(response) {
+          const verify = await fetch('/payment/verify', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...response, orderMeta }),
+          });
+          const result = await verify.json();
+          if (result.success) {
+            window.location.href = `/orders/${result.orderId}`;
+          } else {
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', () => alert('Payment failed. Please try again.'));
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = originalHTML;
+    }
+  }
+
+  // ── Inline address panel ───────────────────────────────────────────────────
+  function showInlineAddressForm() {
+    const overlay = document.getElementById('inline-address-overlay');
+    const panel   = document.getElementById('inline-address-panel');
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { panel.style.transform = 'translateX(0)'; }, 10);
+  }
+
+  function hideInlineAddressForm() {
+    const panel   = document.getElementById('inline-address-panel');
+    const overlay = document.getElementById('inline-address-overlay');
+    panel.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  document.getElementById('inline-address-overlay').addEventListener('click', function(e) {
+    if (e.target === this) hideInlineAddressForm();
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    if (selectedAddressId) {
+      const radio = document.querySelector(`input[value="${selectedAddressId}"]`);
+      if (radio) radio.checked = true;
+    }
+    if (!IS_RENT) {
+      const subtotal = PRODUCT_PRICE;
+      totalAmount    = subtotal + Math.round(subtotal * 0.18);
+    }
+  });
+</script>

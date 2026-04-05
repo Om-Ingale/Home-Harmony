@@ -321,11 +321,16 @@
     💬 Contact Seller
   </a>
 <% } else { %>
-  <button onclick="showContactModal()"
-          class="w-full bg-brand-500 hover:bg-brand-600 text-white
-                 font-semibold py-3 rounded-xl transition-colors shadow-sm">
-    <% if (product.type === 'rent') { %>🏠 Request to Rent<% } else { %>🛒 Buy Now<% } %>
-  </button>
+  <a href="/orders/checkout/<%= product._id %>"
+   class="w-full flex items-center justify-center gap-2 bg-brand-500
+          hover:bg-brand-600 text-white font-semibold py-3 rounded-xl
+          transition-colors shadow-sm">
+  <% if (product.type === 'rent') { %>
+    <i data-lucide="calendar" class="w-4 h-4"></i> Rent Now
+  <% } else { %>
+    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Buy Now
+  <% } %>
+</a>
 <% } %>
           <% } else if (!currentUser) { %>
             <a href="/auth/login"
@@ -344,18 +349,6 @@
           </div>
         <% } %>
 
-        <!-- Razorpay Pay Button -->
-        <% if (currentUser && product.status === 'available' && !product.owner._id.equals(currentUser._id)) { %>
-          <button id="pay-btn" onclick="initiatePayment()"
-                  class="w-full flex items-center justify-center gap-2 bg-stone-900
-                         hover:bg-stone-800 text-white font-semibold py-3 rounded-xl
-                         transition-colors shadow-sm">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14.5 2L19 9H14.5L12 14L9.5 9H5L9.5 2H14.5Z"/>
-            </svg>
-            Pay with Razorpay
-          </button>
-        <% } %>
 
         <!-- Meta Info -->
         <div class="border-t border-stone-100 pt-4 space-y-3">
@@ -418,146 +411,6 @@
   </script>
 <% } %>
 
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--  Razorpay — only loads if user is logged in and not the owner             -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<% if (currentUser && product.status === 'available' && !product.owner._id.equals(currentUser._id)) { %>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  var RAZORPAY_KEY   = '<%= razorpayKey %>';
-  var PRODUCT_ID     = '<%= product._id %>';
-  var PRODUCT_TITLE  = '<%= product.title.replace(/'/g, "\\'") %>';
-  var PRODUCT_AMOUNT = <%= (product.type === 'rent' && product.rentPerMonth) ? product.rentPerMonth : product.price %>;
-  var USER_NAME      = '<%= currentUser.username.replace(/'/g, "\\'") %>';
-  var USER_EMAIL     = '<%= currentUser.email %>';
-
-  // ── Toast helper (no more ugly browser alerts) ──────────────────────────────
-  function showToast(message, type) {
-    var existing = document.getElementById('pay-toast');
-    if (existing) existing.remove();
-
-    var toast = document.createElement('div');
-    toast.id  = 'pay-toast';
-    toast.style.cssText = [
-      'position:fixed',
-      'bottom:24px',
-      'right:24px',
-      'z-index:9999',
-      'padding:14px 20px',
-      'border-radius:12px',
-      'font-size:14px',
-      'font-weight:500',
-      'font-family:"DM Sans",sans-serif',
-      'box-shadow:0 8px 24px rgba(0,0,0,0.12)',
-      'display:flex',
-      'align-items:center',
-      'gap:10px',
-      'max-width:360px',
-      'animation:slideUp 0.3s ease',
-      type === 'success'
-        ? 'background:#f0fdf4;border:1px solid #bbf7d0;color:#166534'
-        : 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b',
-    ].join(';');
-
-    toast.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + message;
-    document.body.appendChild(toast);
-
-    setTimeout(function() {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.4s ease';
-      setTimeout(function() { toast.remove(); }, 400);
-    }, 4000);
-  }
-
-  // ── Add slideUp keyframe once ────────────────────────────────────────────────
-  if (!document.getElementById('toast-style')) {
-    var style = document.createElement('style');
-    style.id  = 'toast-style';
-    style.textContent = '@keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }';
-    document.head.appendChild(style);
-  }
-
-  // ── Main payment function ────────────────────────────────────────────────────
-  async function initiatePayment() {
-    var btn = document.getElementById('pay-btn');
-    var originalHTML = btn.innerHTML;
-
-    btn.disabled   = true;
-    btn.innerHTML  = '<svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Processing...';
-
-    try {
-      // Step 1 — Create order on server
-      var res = await fetch('/payment/create-order', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount:       PRODUCT_AMOUNT,
-          productId:    PRODUCT_ID,
-          productTitle: PRODUCT_TITLE,
-        }),
-      });
-
-      var data = await res.json();
-      if (!data.success) throw new Error('Could not create payment order.');
-
-      // Step 2 — Open Razorpay modal
-      var options = {
-        key:         RAZORPAY_KEY,
-        amount:      data.order.amount,
-        currency:    'INR',
-        name:        'Home Harmony',
-        description: PRODUCT_TITLE,
-        order_id:    data.order.id,
-        prefill: {
-          name:  USER_NAME,
-          email: USER_EMAIL,
-        },
-        theme: { color: '#dc7420' },
-
-        // Step 3 — Verify on success
-        handler: async function(response) {
-          try {
-            var verify = await fetch('/payment/verify', {
-              method:  'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(response),
-            });
-            var result = await verify.json();
-
-            if (result.success) {
-              showToast('Payment successful! ID: ' + result.paymentId, 'success');
-              // Redirect after 2 seconds so user can read the toast
-              setTimeout(function() {
-                window.location.reload();
-              }, 2000);
-            } else {
-              showToast('Payment verification failed. Please contact support.', 'error');
-            }
-          } catch (e) {
-            showToast('Verification error. Please contact support.', 'error');
-          }
-        },
-      };
-
-      var rzp = new Razorpay(options);
-
-      rzp.on('payment.failed', function(response) {
-        showToast('Payment failed: ' + response.error.description, 'error');
-      });
-
-      rzp.open();
-
-    } catch (err) {
-      console.error('Payment error:', err);
-      showToast('Something went wrong. Please try again.', 'error');
-    } finally {
-      btn.disabled  = false;
-      btn.innerHTML = originalHTML;
-      lucide.createIcons();
-    }
-  }
-</script>
-<% } %>
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!--  Contact Modal — lives outside ALL stacking contexts at body level        -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->

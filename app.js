@@ -25,6 +25,7 @@ const productRoutes = require("./routes/products");
 const reviewRoutes = require("./routes/reviews");
 const paymentRoutes = require("./routes/payment");
 const adminRoutes = require("./routes/admin");
+const orderRoutes = require("./routes/orders");
 const addressRoutes = require("./routes/address");
 
 const app = express();
@@ -84,21 +85,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// ─── Routes ───────────────────────────────────
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.render("home", { title: "Home Harmony — Rent, Buy & Sell Furniture" });
 });
 
-app.use("/auth", authRoutes);
-app.use("/products", productRoutes);
-app.use("/products", reviewRoutes); // /products/:id/reviews
-app.use("/payment", paymentRoutes);
-app.use("/admin", adminRoutes);
-app.use("/address", addressRoutes);
-
 app.get("/support", (req, res) => {
   res.render("support", { title: "Help & Support — Home Harmony" });
 });
+
+app.use("/auth", authRoutes);
+app.use("/products", productRoutes);
+app.use("/products", reviewRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/admin", adminRoutes);
+app.use("/orders", orderRoutes);
+app.use("/address", addressRoutes);
 
 // ─── 404 Handler ─────────────────────────────
 app.all("*", (req, res, next) => {

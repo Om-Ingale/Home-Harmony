@@ -93,7 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         link.target === "_blank" ||
         link.href.includes("#") ||
-        link.hasAttribute("download")
+        link.hasAttribute("download") ||
+        link.href.includes("/receipt") ||
+        link.href.startsWith("mailto") ||
+        link.href.startsWith("tel")
       ) return;
 
       showLoader();

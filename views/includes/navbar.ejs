@@ -28,14 +28,18 @@
             <i data-lucide="plus" class="w-4 h-4"></i> List Item
           </a>
 
-          <% if (currentUser && currentUser.role === 'admin') { %>
+          <% if (currentUser.role === 'admin') { %>
             <a href="/admin"
                class="hidden sm:flex items-center gap-1.5 text-sm font-medium text-stone-700 hover:text-brand-600 transition-colors px-3 py-2">
-               <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
+              <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
+            </a>
+            <a href="/admin/orders"
+               class="hidden sm:flex items-center gap-1.5 text-sm font-medium text-stone-700 hover:text-brand-600 transition-colors px-3 py-2">
+              <i data-lucide="package" class="w-4 h-4"></i> Orders
             </a>
           <% } %>
 
-          <!-- User Avatar -->
+          <!-- User Avatar + Dropdown -->
           <div class="relative group">
             <button class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors">
               <img src="<%= currentUser.avatar.url %>" alt="<%= currentUser.username %>"
@@ -43,9 +47,28 @@
               <span class="text-sm font-medium text-stone-700 hidden sm:block"><%= currentUser.username %></span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-400"></i>
             </button>
+
             <!-- Dropdown -->
-            <div class="absolute right-0 top-full mt-2 w-44 bg-white border border-stone-100 rounded-xl shadow-lg py-1.5
+            <div class="absolute right-0 top-full mt-2 w-52 bg-white border border-stone-100 rounded-xl shadow-lg py-1.5
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+
+              <!-- User info pill -->
+              <div class="px-4 py-2 border-b border-stone-100 mb-1">
+                <p class="text-xs font-semibold text-stone-800"><%= currentUser.username %></p>
+                <p class="text-xs text-stone-400 truncate"><%= currentUser.email %></p>
+              </div>
+
+              <a href="/orders/my-orders"
+                 class="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
+                <i data-lucide="package" class="w-4 h-4 text-brand-500"></i> My Orders
+              </a>
+              <a href="/address"
+                 class="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
+                <i data-lucide="map-pin" class="w-4 h-4 text-brand-500"></i> My Addresses
+              </a>
+
+              <div class="border-t border-stone-100 my-1"></div>
+
               <form action="/auth/logout" method="POST">
                 <button type="submit"
                         class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">
@@ -80,8 +103,27 @@
       <a href="/products?type=buy" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">Buy</a>
       <a href="/products?type=sell" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">Sell</a>
       <% if (currentUser) { %>
-        <a href="/products/new" class="block px-3 py-2 text-sm text-brand-600 font-medium hover:bg-brand-50 rounded-lg">+ List an Item</a>
+        <div class="border-t border-stone-100 pt-2 mt-2 space-y-1">
+          <a href="/products/new" class="block px-3 py-2 text-sm text-brand-600 font-medium hover:bg-brand-50 rounded-lg">
+            + List an Item
+          </a>
+          <a href="/orders/my-orders" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">
+            📦 My Orders
+          </a>
+          <a href="/address" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">
+            🏠 My Addresses
+          </a>
+          <% if (currentUser.role === 'admin') { %>
+            <a href="/admin" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">
+              🛡️ Admin Panel
+            </a>
+            <a href="/admin/orders" class="block px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 rounded-lg">
+              📋 Manage Orders
+            </a>
+          <% } %>
+        </div>
       <% } %>
     </div>
+
   </div>
-</nav>  
+</nav>
