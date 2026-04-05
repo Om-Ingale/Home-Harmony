@@ -25,6 +25,7 @@ const productRoutes = require("./routes/products");
 const reviewRoutes = require("./routes/reviews");
 const paymentRoutes = require("./routes/payment");
 const adminRoutes = require("./routes/admin");
+const addressRoutes = require("./routes/address");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -93,6 +94,7 @@ app.use("/products", productRoutes);
 app.use("/products", reviewRoutes); // /products/:id/reviews
 app.use("/payment", paymentRoutes);
 app.use("/admin", adminRoutes);
+app.use("/address", addressRoutes);
 
 app.get("/support", (req, res) => {
   res.render("support", { title: "Help & Support — Home Harmony" });
