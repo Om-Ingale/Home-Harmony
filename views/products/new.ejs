@@ -2,66 +2,60 @@
 
 <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
   <div class="mb-8">
-    <h1 class="font-display text-3xl font-bold text-stone-900">
-      Create a Listing
-    </h1>
-    <p class="text-stone-500 mt-1">
-      Fill in the details to list your item on Home Harmony
-    </p>
+    <h1 class="font-display text-3xl font-bold text-stone-900">Create a Listing</h1>
+    <p class="text-stone-500 mt-1">Fill in the details to list your item on Home Harmony</p>
   </div>
 
-  <form
-    action="/products"
-    method="POST"
-    class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 space-y-6"
-    enctype="multipart/form-data"
-    id="productForm"
-  >
+  <form action="/products" method="POST"
+        class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 space-y-6"
+        enctype="multipart/form-data" id="productForm">
+
+    <!-- Title -->
     <div>
-      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="title"
-        >Title <span class="text-red-400">*</span></label
-      >
-      <input
-        type="text"
-        name="product[title]"
-        id="title"
-        required
-        maxlength="100"
-        placeholder="e.g. Wooden Study Table with Shelf"
-        class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
-      />
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="title">
+        Title <span class="text-red-400">*</span>
+      </label>
+      <input type="text" name="product[title]" id="title" required maxlength="100"
+             placeholder="e.g. Wooden Study Table with Shelf"
+             class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
     </div>
 
+    <!-- Description -->
     <div>
-      <label
-        class="block text-sm font-medium text-stone-700 mb-1.5"
-        for="description"
-        >Description <span class="text-red-400">*</span></label
-      >
-      <textarea
-        name="product[description]"
-        id="description"
-        rows="4"
-        required
-        maxlength="2000"
-        placeholder="Describe the condition, dimensions, brand, age, etc."
-        class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none"
-      ></textarea>
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="description">
+        Description <span class="text-red-400">*</span>
+      </label>
+      <textarea name="product[description]" id="description" rows="4" required maxlength="2000"
+                placeholder="Describe the condition, dimensions, brand, age, etc."
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none"></textarea>
     </div>
 
+    <!-- Type + Category -->
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="category"
-          >Category <span class="text-red-400">*</span></label
-        >
-        <select
-          name="product[category]"
-          id="category"
-          required
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white"
-        >
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="type">
+          Listing Type <span class="text-red-400">*</span>
+        </label>
+        <select name="product[type]" id="type" required
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+          <option value="" disabled selected>Select type</option>
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <option value="rent">Rent</option>
+            <option value="buy">Buy</option>
+          <% } %>
+          <option value="sell">Sell</option>
+        </select>
+        <% if (!currentUser || currentUser.role !== 'admin') { %>
+          <p class="text-xs text-stone-400 mt-1">Only admins can create Rent/Buy listings.</p>
+        <% } %>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="category">
+          Category <span class="text-red-400">*</span>
+        </label>
+        <select name="product[category]" id="category" required
+                class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
           <option value="" disabled selected>Select category</option>
           <option value="furniture">Furniture</option>
           <option value="appliance">Appliance</option>
@@ -70,152 +64,158 @@
           <option value="other">Other</option>
         </select>
       </div>
+    </div>
 
-      <div>
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="type"
-          >Listing Type <span class="text-red-400">*</span></label
-        >
-        <select
-          name="product[type]"
-          id="type"
-          required
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white"
-        >
-          <option value="" disabled selected>Select type</option>
-          <option value="rent">Rent</option>
-          <option value="buy">Buy</option>
-          <option value="sell">Sell</option>
-        </select>
+    <!-- Subcategory (dynamic) -->
+    <div id="subcategoryField" class="hidden">
+      <label class="block text-sm font-medium text-stone-700 mb-1.5" for="subcategory">Subcategory</label>
+      <select name="product[subcategory]" id="subcategory"
+              class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 bg-white">
+        <option value="">Select subcategory</option>
+      </select>
+    </div>
+
+    <!-- Condition -->
+    <div>
+      <label class="block text-sm font-medium text-stone-700 mb-1.5">Condition <span class="text-red-400">*</span></label>
+      <div class="flex gap-3">
+        <% ['new','refurbished','used'].forEach(c => { %>
+          <label class="flex-1 cursor-pointer">
+            <input type="radio" name="product[condition]" value="<%= c %>" class="sr-only peer" <%= c === 'used' ? 'checked' : '' %> />
+            <span class="block text-center py-2 border border-stone-200 rounded-xl text-sm capitalize
+                         peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-700
+                         hover:bg-stone-50 transition-all">
+              <%= c %>
+            </span>
+          </label>
+        <% }) %>
       </div>
     </div>
 
+    <!-- Price + Rent -->
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="price"
-        >
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="price">
           Price (₹) <span class="text-red-400">*</span>
         </label>
-        <input
-          type="number"
-          name="product[price]"
-          id="price"
-          required
-          min="0"
-          placeholder="e.g. 5000"
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
-        />
+        <input type="number" name="product[price]" id="price" required min="0"
+               placeholder="e.g. 5000"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
       </div>
-
       <div id="rentPerMonthField" class="hidden">
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="rentPerMonth"
-          >Rent/Month (₹)</label
-        >
-        <input
-          type="number"
-          name="product[rentPerMonth]"
-          id="rentPerMonth"
-          min="0"
-          placeholder="Monthly rent"
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
-        />
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="rentPerMonth">Rent/Month (₹)</label>
+        <input type="number" name="product[rentPerMonth]" id="rentPerMonth" min="0"
+               placeholder="Monthly rent"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
       </div>
     </div>
 
+    <!-- Stock (admin only, for rent/buy) -->
+    <% if (currentUser && currentUser.role === 'admin') { %>
+      <div id="stockField" class="hidden">
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="stock">
+          Stock Quantity <span class="text-red-400">*</span>
+        </label>
+        <input type="number" name="product[stock]" id="stock" min="1"
+               placeholder="e.g. 10"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
+        <p class="text-xs text-stone-400 mt-1">Required for Rent and Buy listings.</p>
+      </div>
+    <% } %>
+
+    <!-- City + Location -->
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="city"
-          >City <span class="text-red-400">*</span></label
-        >
-        <input
-          type="text"
-          name="product[city]"
-          id="city"
-          required
-          placeholder="e.g. Mumbai"
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
-        />
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="city">
+          City <span class="text-red-400">*</span>
+        </label>
+        <input type="text" name="product[city]" id="city" required placeholder="e.g. Mumbai"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
       </div>
-
       <div>
-        <label
-          class="block text-sm font-medium text-stone-700 mb-1.5"
-          for="location"
-          >Area / Locality</label
-        >
-        <input
-          type="text"
-          name="product[location]"
-          id="location"
-          placeholder="e.g. Bandra West"
-          class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
-        />
+        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="location">Area / Locality</label>
+        <input type="text" name="product[location]" id="location" placeholder="e.g. Bandra West"
+               class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300" />
       </div>
     </div>
+
+    <!-- Images -->
     <div>
       <label class="block text-sm font-medium text-stone-700 mb-1.5">
         Images <span class="text-stone-400 text-xs">(up to 6)</span>
       </label>
-      <div
-        class="border-2 border-dashed border-stone-200 rounded-xl p-6 text-center hover:border-brand-300 transition-colors cursor-pointer"
-        onclick="document.getElementById('images').click()"
-      >
-        <i
-          data-lucide="image-plus"
-          class="w-8 h-8 text-stone-300 mx-auto mb-2"
-        ></i>
+      <div class="border-2 border-dashed border-stone-200 rounded-xl p-6 text-center hover:border-brand-300 transition-colors cursor-pointer"
+           onclick="document.getElementById('images').click()">
+        <i data-lucide="image-plus" class="w-8 h-8 text-stone-300 mx-auto mb-2"></i>
         <p class="text-sm text-stone-400">Click to upload images</p>
         <p class="text-xs text-stone-300 mt-1">JPG, PNG, WEBP — max 6 files</p>
-        <input
-          type="file"
-          name="product[images]"
-          id="images"
-          multiple
-          accept="image/*"
-          class="hidden"
-          onchange="previewImages(this)"
-        />
+        <input type="file" name="product[images]" id="images" multiple accept="image/*"
+               class="hidden" onchange="previewImages(this)" />
       </div>
       <div id="image-preview" class="flex flex-wrap gap-3 mt-3"></div>
     </div>
+
+    <!-- Submit -->
     <div class="pt-2 flex gap-3">
-      <button
-        type="submit"
-        class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm"
-      >
+      <button type="submit"
+              class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
         Create Listing
       </button>
-      <a
-        href="/products"
-        class="px-6 py-3 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-50 transition-colors text-sm font-medium flex items-center"
-      >
+      <a href="/products"
+         class="px-6 py-3 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-50 transition-colors text-sm font-medium flex items-center">
         Cancel
       </a>
     </div>
   </form>
-
-  <script>
-    function previewImages(input) {
-      const preview = document.getElementById("image-preview");
-      preview.innerHTML = "";
-      Array.from(input.files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement("img");
-          img.src = e.target.result;
-          img.className =
-            "w-24 h-24 object-cover rounded-xl border border-stone-200";
-          preview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  </script>
 </div>
+
+<script>
+  const subcategoryMap = <%- JSON.stringify(subcategories) %>;
+
+  const typeSelect         = document.getElementById('type');
+  const categorySelect     = document.getElementById('category');
+  const subcategoryField   = document.getElementById('subcategoryField');
+  const subcategorySelect  = document.getElementById('subcategory');
+  const rentPerMonthField  = document.getElementById('rentPerMonthField');
+  const stockField         = document.getElementById('stockField');
+
+  function updateFormFields() {
+    const type     = typeSelect?.value;
+    const category = categorySelect?.value;
+
+    // rentPerMonth
+    if (rentPerMonthField) rentPerMonthField.classList.toggle('hidden', type !== 'rent');
+
+    // stock (admin only)
+    if (stockField) stockField.classList.toggle('hidden', type !== 'rent' && type !== 'buy');
+
+    // subcategory
+    const subs = subcategoryMap[category] || [];
+    if (subs.length > 0) {
+      subcategorySelect.innerHTML = '<option value="">Select subcategory</option>' +
+        subs.map(s => `<option value="${s}">${s}</option>`).join('');
+      subcategoryField.classList.remove('hidden');
+    } else {
+      subcategoryField.classList.add('hidden');
+    }
+  }
+
+  typeSelect?.addEventListener('change', updateFormFields);
+  categorySelect?.addEventListener('change', updateFormFields);
+  updateFormFields();
+
+  function previewImages(input) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'w-24 h-24 object-cover rounded-xl border border-stone-200';
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>

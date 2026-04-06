@@ -3,7 +3,7 @@
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <!-- ── Left: Images + Details ─────────────────────────────────────────── -->
+    <!-- ── Left: Images + Details ──────────────────────────────────────────── -->
     <div class="lg:col-span-2 space-y-6">
 
       <!-- Back -->
@@ -12,156 +12,118 @@
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to listings
       </a>
 
-      <!-- ── Image Gallery ─────────────────────────────────────────────────── -->
-<div class="space-y-3">
-
-  <!-- Main Image with Prev/Next arrows -->
-  <div class="relative rounded-2xl overflow-hidden bg-stone-100 aspect-video group">
-    <% product.images.forEach(function(img, i) { %>
-      <img src="<%= img.url %>"
-           alt="Image <%= i + 1 %>"
-           id="main-img-<%= i %>"
-           class="main-gallery-img absolute inset-0 w-full h-full object-cover transition-opacity duration-300 <%= i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' %>" />
-    <% }); %>
-
-    <!-- Prev Button -->
-    <% if (product.images.length > 1) { %>
-      <button onclick="changeImage(-1)"
-              class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80
-                     hover:bg-white rounded-full shadow-md flex items-center justify-center
-                     opacity-0 group-hover:opacity-100 transition-opacity">
-        <i data-lucide="chevron-left" class="w-5 h-5 text-stone-700"></i>
-      </button>
-
-      <!-- Next Button -->
-      <button onclick="changeImage(1)"
-              class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80
-                     hover:bg-white rounded-full shadow-md flex items-center justify-center
-                     opacity-0 group-hover:opacity-100 transition-opacity">
-        <i data-lucide="chevron-right" class="w-5 h-5 text-stone-700"></i>
-      </button>
-
-      <!-- Dot indicators -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
-        <% product.images.forEach(function(img, i) { %>
-          <button onclick="goToImage(<%= i %>)"
-                  id="dot-<%= i %>"
-                  class="w-2 h-2 rounded-full transition-all <%= i === 0 ? 'bg-white scale-125' : 'bg-white/50' %>">
-          </button>
-        <% }); %>
+      <!-- Image Gallery -->
+      <div class="space-y-3">
+        <div class="relative rounded-2xl overflow-hidden bg-stone-100 aspect-video group">
+          <% product.images.forEach(function(img, i) { %>
+            <img src="<%= img.url %>" alt="Image <%= i + 1 %>" id="main-img-<%= i %>"
+                 class="main-gallery-img absolute inset-0 w-full h-full object-cover transition-opacity duration-300 <%= i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' %>" />
+          <% }); %>
+          <% if (product.images.length > 1) { %>
+            <button onclick="changeImage(-1)"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80 hover:bg-white rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <i data-lucide="chevron-left" class="w-5 h-5 text-stone-700"></i>
+            </button>
+            <button onclick="changeImage(1)"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white/80 hover:bg-white rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <i data-lucide="chevron-right" class="w-5 h-5 text-stone-700"></i>
+            </button>
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+              <% product.images.forEach(function(img, i) { %>
+                <button onclick="goToImage(<%= i %>)" id="dot-<%= i %>"
+                        class="w-2 h-2 rounded-full transition-all <%= i === 0 ? 'bg-white scale-125' : 'bg-white/50' %>"></button>
+              <% }); %>
+            </div>
+            <div class="absolute top-3 right-3 z-20 bg-black/40 text-white text-xs px-2.5 py-1 rounded-full">
+              <span id="img-counter">1</span> / <%= product.images.length %>
+            </div>
+          <% } %>
+        </div>
+        <% if (product.images.length > 1) { %>
+          <div class="flex gap-2 overflow-x-auto pb-1">
+            <% product.images.forEach(function(img, i) { %>
+              <img src="<%= img.url %>" alt="Thumb <%= i + 1 %>" id="thumb-<%= i %>"
+                   onclick="goToImage(<%= i %>)"
+                   class="w-20 h-20 shrink-0 object-cover rounded-xl border-2 cursor-pointer transition-all hover:border-brand-400 <%= i === 0 ? 'border-brand-500 shadow-md' : 'border-stone-200' %>" />
+            <% }); %>
+          </div>
+        <% } %>
       </div>
 
-      <!-- Image counter -->
-      <div class="absolute top-3 right-3 z-20 bg-black/40 text-white text-xs px-2.5 py-1 rounded-full">
-        <span id="img-counter">1</span> / <%= product.images.length %>
-      </div>
-    <% } %>
-  </div>
-
-  <!-- Thumbnails -->
-  <% if (product.images.length > 1) { %>
-    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-      <% product.images.forEach(function(img, i) { %>
-        <img src="<%= img.url %>"
-             alt="Thumbnail <%= i + 1 %>"
-             id="thumb-<%= i %>"
-             onclick="goToImage(<%= i %>)"
-             class="w-20 h-20 shrink-0 object-cover rounded-xl border-2 cursor-pointer
-                    transition-all hover:border-brand-400
-                    <%= i === 0 ? 'border-brand-500 shadow-md' : 'border-stone-200' %>" />
-      <% }); %>
-    </div>
-  <% } %>
-</div>
-
-<script>
-  let currentImg = 0;
-  const totalImgs = <%= product.images.length %>;
-
-  function goToImage(index) {
-    // Hide current
-    document.getElementById('main-img-' + currentImg).classList.remove('opacity-100', 'z-10');
-    document.getElementById('main-img-' + currentImg).classList.add('opacity-0', 'z-0');
-    document.getElementById('dot-' + currentImg)?.classList.remove('bg-white', 'scale-125');
-    document.getElementById('dot-' + currentImg)?.classList.add('bg-white/50');
-    document.getElementById('thumb-' + currentImg)?.classList.remove('border-brand-500', 'shadow-md');
-    document.getElementById('thumb-' + currentImg)?.classList.add('border-stone-200');
-
-    // Show new
-    currentImg = (index + totalImgs) % totalImgs;
-    document.getElementById('main-img-' + currentImg).classList.remove('opacity-0', 'z-0');
-    document.getElementById('main-img-' + currentImg).classList.add('opacity-100', 'z-10');
-    document.getElementById('dot-' + currentImg)?.classList.remove('bg-white/50');
-    document.getElementById('dot-' + currentImg)?.classList.add('bg-white', 'scale-125');
-    document.getElementById('thumb-' + currentImg)?.classList.remove('border-stone-200');
-    document.getElementById('thumb-' + currentImg)?.classList.add('border-brand-500', 'shadow-md');
-
-    // Update counter
-    const counter = document.getElementById('img-counter');
-    if (counter) counter.textContent = currentImg + 1;
-  }
-
-  function changeImage(direction) {
-    goToImage(currentImg + direction);
-  }
-
-  // ── Touch/Swipe support ───────────────────────────────────────────────
-  let touchStartX = 0;
-  const gallery = document.querySelector('.group.relative.rounded-2xl');
-  if (gallery) {
-    gallery.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-    gallery.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) changeImage(diff > 0 ? 1 : -1);
-    });
-  }
-</script>
+      <script>
+        let currentImg = 0;
+        const totalImgs = <%= product.images.length %>;
+        function goToImage(index) {
+          document.getElementById('main-img-' + currentImg).classList.replace('opacity-100','opacity-0');
+          document.getElementById('main-img-' + currentImg).classList.replace('z-10','z-0');
+          document.getElementById('dot-' + currentImg)?.classList.remove('bg-white','scale-125');
+          document.getElementById('dot-' + currentImg)?.classList.add('bg-white/50');
+          document.getElementById('thumb-' + currentImg)?.classList.replace('border-brand-500','border-stone-200');
+          currentImg = (index + totalImgs) % totalImgs;
+          document.getElementById('main-img-' + currentImg).classList.replace('opacity-0','opacity-100');
+          document.getElementById('main-img-' + currentImg).classList.replace('z-0','z-10');
+          document.getElementById('dot-' + currentImg)?.classList.remove('bg-white/50');
+          document.getElementById('dot-' + currentImg)?.classList.add('bg-white','scale-125');
+          document.getElementById('thumb-' + currentImg)?.classList.replace('border-stone-200','border-brand-500');
+          const counter = document.getElementById('img-counter');
+          if (counter) counter.textContent = currentImg + 1;
+        }
+        function changeImage(dir) { goToImage(currentImg + dir); }
+        let touchStartX = 0;
+        const gallery = document.querySelector('.group.relative.rounded-2xl');
+        if (gallery) {
+          gallery.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+          gallery.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) changeImage(diff > 0 ? 1 : -1);
+          });
+        }
+      </script>
 
       <!-- Badges + Title -->
       <div>
         <div class="flex flex-wrap items-center gap-2 mb-3">
-
-          <% if (product.type === 'rent') { %>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize bg-blue-100 text-blue-700">
-              <%= product.type %>
-            </span>
-          <% } else if (product.type === 'buy') { %>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize bg-emerald-100 text-emerald-700">
-              <%= product.type %>
-            </span>
-          <% } else { %>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize bg-amber-100 text-amber-700">
-              <%= product.type %>
-            </span>
-          <% } %>
-
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize
+            <%= product.type === 'rent' ? 'bg-blue-100 text-blue-700' :
+                product.type === 'buy'  ? 'bg-emerald-100 text-emerald-700' :
+                                          'bg-amber-100 text-amber-700' %>">
+            <%= product.type %>
+          </span>
           <span class="text-xs px-2.5 py-1 rounded-full bg-stone-100 text-stone-600 capitalize">
             <%= product.category %>
           </span>
-
-          <% if (product.status === 'available') { %>
-            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 capitalize">
-              <%= product.status %>
-            </span>
-          <% } else { %>
-            <span class="text-xs px-2.5 py-1 rounded-full bg-red-100 text-red-700 capitalize">
-              <%= product.status %>
+          <% if (product.subcategory) { %>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-stone-100 text-stone-500 capitalize">
+              <%= product.subcategory %>
             </span>
           <% } %>
-
+          <% if (product.condition) { %>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-stone-100 text-stone-600 capitalize">
+              <%= product.condition %>
+            </span>
+          <% } %>
+          <% if (product.isAvailable) { %>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">Available</span>
+          <% } else { %>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-red-100 text-red-700">Unavailable</span>
+          <% } %>
         </div>
 
-        <h1 class="font-display text-3xl font-bold text-stone-900 mb-2">
-          <%= product.title %>
-        </h1>
+        <h1 class="font-display text-3xl font-bold text-stone-900 mb-2"><%= product.title %></h1>
 
-        <div class="flex items-center gap-4 text-stone-500 text-sm mb-5">
+        <div class="flex items-center text-stone-500 text-sm mb-5">
           <span class="flex items-center gap-1.5">
+            <% if (product.ownerType !== 'platform') { %>
             <i data-lucide="map-pin" class="w-4 h-4"></i>
             <%= product.city %><% if (product.location) { %>, <%= product.location %><% } %>
+            <%}%>
           </span>
           <span class="flex items-center gap-1.5">
-            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <% if (product.ownerType !== 'platform') { %>
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400 ml-4"></i>
+            <%} else {%>
+              <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <%}%>
             <%= product.averageRating || 'No ratings' %>
             (<%= product.reviews.length %> review<%= product.reviews.length !== 1 ? 's' : '' %>)
           </span>
@@ -170,25 +132,29 @@
         <p class="text-stone-600 leading-relaxed"><%= product.description %></p>
       </div>
 
-      <!-- Owner Actions -->
-      <% if (currentUser && product.owner._id.equals(currentUser._id)) { %>
+      <!-- Owner Actions (admin for platform, owner for sell) -->
+      <%
+        const canEdit = currentUser && (
+          (product.ownerType === 'platform' && currentUser.role === 'admin') ||
+          (product.ownerType === 'user' && product.owner && product.owner._id.equals(currentUser._id))
+        );
+      %>
+      <% if (canEdit) { %>
         <div class="flex gap-3 pt-2">
           <a href="/products/<%= product._id %>/edit"
-             class="flex items-center gap-2 border border-stone-200 text-stone-700
-                    hover:bg-stone-50 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+             class="flex items-center gap-2 border border-stone-200 text-stone-700 hover:bg-stone-50 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
             <i data-lucide="pencil" class="w-4 h-4"></i> Edit Listing
           </a>
           <form id="delete-listing-form" action="/products/<%= product._id %>?_method=DELETE" method="POST">
-  <button type="button" onclick="showDeleteModal()"
-          class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600
-                 hover:bg-red-100 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
-    <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
-  </button>
-</form>
+            <button type="button" onclick="showDeleteModal()"
+                    class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+            </button>
+          </form>
         </div>
       <% } %>
 
-      <!-- ── MapBox Map ──────────────────────────────────────────────────── -->
+      <!-- MapBox -->
       <% if (product.geometry && product.geometry.coordinates[0] !== 0) { %>
         <div class="pt-2">
           <h3 class="font-semibold text-stone-800 mb-3 flex items-center gap-2">
@@ -198,88 +164,92 @@
         </div>
       <% } %>
 
-      <!-- ── Reviews Section ────────────────────────────────────────────── -->
+      <!-- Reviews -->
       <div class="pt-4 border-t border-stone-100">
         <h2 class="font-display text-2xl font-bold text-stone-900 mb-6">Reviews</h2>
 
-        <!-- Review Form -->
-        <% if (currentUser && !product.owner._id.equals(currentUser._id)) { %>
+        <% if (currentUser && product.ownerType === 'user' && product.owner && !product.owner._id.equals(currentUser._id)) { %>
           <div class="bg-stone-50 rounded-2xl border border-stone-100 p-6 mb-6">
             <h3 class="font-semibold text-stone-800 mb-4">Leave a Review</h3>
             <form action="/products/<%= product._id %>/reviews" method="POST" class="space-y-4">
-
               <div>
                 <label class="text-sm font-medium text-stone-600 block mb-2">Rating</label>
                 <div class="flex gap-1" id="star-container">
                   <% for (let i = 1; i <= 5; i++) { %>
                     <button type="button" data-val="<%= i %>"
-                            class="star-btn w-8 h-8 text-stone-300 hover:text-amber-400 transition-colors text-xl">
-                      ★
-                    </button>
+                            class="star-btn w-8 h-8 text-stone-300 hover:text-amber-400 transition-colors text-xl">★</button>
                   <% } %>
                 </div>
                 <input type="hidden" name="review[rating]" id="rating-input" value="5" required />
               </div>
-
               <div>
-                <label class="text-sm font-medium text-stone-600 block mb-1.5" for="comment">
-                  Comment
-                </label>
+                <label class="text-sm font-medium text-stone-600 block mb-1.5" for="comment">Comment</label>
                 <textarea name="review[comment]" id="comment" rows="3" required
                           placeholder="Share your experience with this listing..."
-                          class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm
-                                 focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none bg-white"></textarea>
+                          class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none bg-white"></textarea>
               </div>
-
               <button type="submit"
-                      class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2.5
-                             rounded-xl text-sm font-medium transition-colors">
+                      class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                Submit Review
+              </button>
+            </form>
+          </div>
+        <% } else if (currentUser && product.ownerType === 'platform') { %>
+          <div class="bg-stone-50 rounded-2xl border border-stone-100 p-6 mb-6">
+            <h3 class="font-semibold text-stone-800 mb-4">Leave a Review</h3>
+            <form action="/products/<%= product._id %>/reviews" method="POST" class="space-y-4">
+              <div>
+                <label class="text-sm font-medium text-stone-600 block mb-2">Rating</label>
+                <div class="flex gap-1">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                    <button type="button" data-val="<%= i %>"
+                            class="star-btn w-8 h-8 text-stone-300 hover:text-amber-400 transition-colors text-xl">★</button>
+                  <% } %>
+                </div>
+                <input type="hidden" name="review[rating]" id="rating-input" value="5" required />
+              </div>
+              <div>
+                <textarea name="review[comment]" rows="3" required
+                          placeholder="Share your experience..."
+                          class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 resize-none bg-white"></textarea>
+              </div>
+              <button type="submit"
+                      class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors">
                 Submit Review
               </button>
             </form>
           </div>
         <% } %>
 
-        <!-- Review List -->
         <% if (product.reviews.length === 0) { %>
           <p class="text-stone-400 text-sm py-4">No reviews yet. Be the first to review!</p>
         <% } else { %>
           <div class="space-y-4">
             <% product.reviews.forEach(function(review) { %>
+              <% if (!review || !review.author) return; %>
               <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
                 <div class="flex items-start justify-between">
                   <div class="flex items-center gap-3">
-                    <img src="<%= review.author.avatar.url %>"
+                    <img src="<%= review.author.avatar?.url || 'https://ui-avatars.com/api/?name=' + review.author.username %>"
                          alt="<%= review.author.username %>"
                          class="w-9 h-9 rounded-full object-cover border border-stone-100" />
                     <div>
                       <p class="font-medium text-stone-800 text-sm"><%= review.author.username %></p>
                       <p class="text-xs text-stone-400">
-                        <%= new Date(review.createdAt).toLocaleDateString('en-IN', {
-                          day: 'numeric', month: 'short', year: 'numeric'
-                        }) %>
+                        <%= new Date(review.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) %>
                       </p>
                     </div>
                   </div>
                   <div class="flex items-center gap-0.5">
                     <% for (let i = 1; i <= 5; i++) { %>
-                      <% if (i <= review.rating) { %>
-                        <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-amber-400"></i>
-                      <% } else { %>
-                        <i data-lucide="star" class="w-3.5 h-3.5 text-stone-200"></i>
-                      <% } %>
+                      <i data-lucide="star" class="w-3.5 h-3.5 <%= i <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-stone-200' %>"></i>
                     <% } %>
                   </div>
                 </div>
-
                 <p class="text-stone-600 text-sm mt-3 leading-relaxed"><%= review.comment %></p>
-
                 <% if (currentUser && review.author._id.equals(currentUser._id)) { %>
-                  <form action="/products/<%= product._id %>/reviews/<%= review._id %>?_method=DELETE"
-                        method="POST" class="mt-3">
-                    <button type="submit"
-                            class="text-xs text-red-400 hover:text-red-600
-                                   flex items-center gap-1 transition-colors">
+                  <form action="/products/<%= product._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="mt-3">
+                    <button type="submit" class="text-xs text-red-400 hover:text-red-600 flex items-center gap-1 transition-colors">
                       <i data-lucide="trash-2" class="w-3 h-3"></i> Delete
                     </button>
                   </form>
@@ -291,7 +261,7 @@
       </div>
     </div>
 
-    <!-- ── Right: Price Card ───────────────────────────────────────────────── -->
+    <!-- ── Right: Price Card ────────────────────────────────────────────────── -->
     <div class="lg:col-span-1">
       <div class="sticky top-24 bg-white rounded-2xl border border-stone-100 shadow-md p-6 space-y-4">
 
@@ -305,264 +275,171 @@
             <% } %>
           </p>
           <% if (product.type === 'rent' && product.rentPerMonth) { %>
-            <p class="text-sm text-stone-500 mt-1">
-              Monthly rent: ₹<%= product.rentPerMonth.toLocaleString('en-IN') %>
-            </p>
+            <p class="text-sm text-stone-500 mt-1">Monthly rent: ₹<%= product.rentPerMonth.toLocaleString('en-IN') %></p>
           <% } %>
         </div>
 
-        <!-- Primary CTA -->
-        <% if (product.status === 'available') { %>
-          <% if (currentUser && !product.owner._id.equals(currentUser._id)) { %>
-            <% if (product.type === 'sell') { %>
-  <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>&body=Hi <%= product.owner.username %>,%0A%0AI'm interested in your listing '<%= product.title %>' on Home Harmony.%0A%0APlease let me know if it's still available.%0A%0AThanks"
-     class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600
-            text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
-    💬 Contact Seller
-  </a>
-<% } else { %>
-  <a href="/orders/checkout/<%= product._id %>"
-   class="w-full flex items-center justify-center gap-2 bg-brand-500
-          hover:bg-brand-600 text-white font-semibold py-3 rounded-xl
-          transition-colors shadow-sm">
-  <% if (product.type === 'rent') { %>
-    <i data-lucide="calendar" class="w-4 h-4"></i> Rent Now
-  <% } else { %>
-    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Buy Now
-  <% } %>
-</a>
-<% } %>
-          <% } else if (!currentUser) { %>
-            <a href="/auth/login"
-               class="w-full block text-center bg-brand-500 hover:bg-brand-600
-                      text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
-              Sign in to
-              <% if (product.type === 'rent') { %>Rent
-              <% } else if (product.type === 'buy') { %>Buy
-              <% } else { %>Contact<% } %>
-            </a>
-          <% } %>
-        <% } else { %>
-          <div class="w-full bg-stone-100 text-stone-500 font-semibold
-                      py-3 rounded-xl text-center capitalize">
-            <%= product.status %>
+        <!-- Stock info for rent/buy -->
+        <% if (product.type === 'rent' || product.type === 'buy') { %>
+          <div class="flex items-center gap-2 text-sm">
+            <% if (product.availableStock > 0) { %>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+              <span class="text-emerald-700 font-medium"><%= product.availableStock %> in stock</span>
+            <% } else { %>
+              <span class="w-2 h-2 rounded-full bg-red-400 inline-block"></span>
+              <span class="text-red-600 font-medium">Out of stock</span>
+            <% } %>
           </div>
         <% } %>
 
+        <!-- CTA -->
+        <%
+          const isOwnerView = currentUser && product.ownerType === 'user' && product.owner && product.owner._id.equals(currentUser._id);
+          const isPlatform  = product.ownerType === 'platform';
+          const canOrder    = product.isAvailable && !isOwnerView &&
+                              (isPlatform ? product.availableStock > 0 : true);
+        %>
+
+        <% if (!currentUser) { %>
+          <a href="/auth/login"
+             class="w-full block text-center bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
+            Sign in to <%= product.type === 'rent' ? 'Rent' : product.type === 'buy' ? 'Buy' : 'Contact' %>
+          </a>
+
+        <% } else if (canOrder) { %>
+          <% if (product.type === 'sell') { %>
+            <a href="mailto:<%= product.owner?.email %>?subject=Enquiry about <%= product.title %>&body=Hi <%= product.owner?.username %>,%0A%0AI'm interested in your listing '<%= product.title %>' on Home Harmony.%0A%0APlease let me know if it's still available.%0A%0AThanks"
+               class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
+              💬 Contact Seller
+            </a>
+          <% } else { %>
+            <a href="/orders/checkout/<%= product._id %>"
+               class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm">
+              <% if (product.type === 'rent') { %>
+                <i data-lucide="calendar" class="w-4 h-4"></i> Rent Now
+              <% } else { %>
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i> Buy Now
+              <% } %>
+            </a>
+          <% } %>
+
+        <% } else { %>
+          <div class="w-full bg-stone-100 text-stone-500 font-semibold py-3 rounded-xl text-center">
+            <%= !product.isAvailable ? 'Unavailable' : isOwnerView ? 'Your Listing' : 'Out of Stock' %>
+          </div>
+        <% } %>
 
         <!-- Meta Info -->
         <div class="border-t border-stone-100 pt-4 space-y-3">
           <div class="flex items-center gap-3 text-sm text-stone-500">
             <i data-lucide="user" class="w-4 h-4 text-stone-400 shrink-0"></i>
             <span>
-              Listed by <strong class="text-stone-700"><%= product.owner.username %></strong>
+              Listed by
+              <% if (product.ownerType === 'platform') { %>
+                <strong class="text-brand-600">Home Harmony</strong>
+              <% } else { %>
+                <strong class="text-stone-700"><%= product.owner?.username || 'Unknown' %></strong>
+              <% } %>
             </span>
           </div>
           <div class="flex items-center gap-3 text-sm text-stone-500">
-            <i data-lucide="calendar" class="w-4 h-4 text-stone-400 shrink-0"></i>
-            <span>
-              <%= new Date(product.createdAt).toLocaleDateString('en-IN', {
-                day: 'numeric', month: 'long', year: 'numeric'
-              }) %>
-            </span>
+            <% if (product.ownerType !== 'platform') { %>
+              <i data-lucide="calendar" class="w-4 h-4 text-stone-400 shrink-0"></i>
+            <span><%= new Date(product.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) %></span>
+            <% } %>
           </div>
           <div class="flex items-center gap-3 text-sm text-stone-500">
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
             <span class="text-emerald-600">Verified Listing</span>
           </div>
         </div>
-
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--  MapBox GL JS — only loads if product has valid coordinates               -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- MapBox -->
 <% if (product.geometry && product.geometry.coordinates[0] !== 0) { %>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script>
     mapboxgl.accessToken = '<%- mapboxToken %>';
-
     var coords = <%- JSON.stringify(product.geometry.coordinates) %>;
-    var title  = '<%= product.title.replace(/'/g, "\\'") %>';
-    var city   = '<%= product.city.replace(/'/g, "\\'") %>';
-
-    var map = new mapboxgl.Map({
-      container:  'map',
-      style:      'mapbox://styles/mapbox/light-v11',
-      center:     coords,
-      zoom:       12,
-      scrollZoom: false,
-    });
-
-    new mapboxgl.Marker({ color: '#dc7420' })
-      .setLngLat(coords)
-      .setPopup(
-        new mapboxgl.Popup({ offset: 25 })
-          .setHTML('<strong>' + title + '</strong><br/>' + city)
-      )
+    var map = new mapboxgl.Map({ container:'map', style:'mapbox://styles/mapbox/light-v11', center:coords, zoom:12, scrollZoom:false });
+    new mapboxgl.Marker({ color:'#dc7420' }).setLngLat(coords)
+      .setPopup(new mapboxgl.Popup({ offset:25 }).setHTML('<strong><%= product.title.replace(/'/g, "\\'") %></strong><br/><%= product.city %>'))
       .addTo(map);
-
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
   </script>
 <% } %>
 
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--  Contact Modal — lives outside ALL stacking contexts at body level        -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<% if (currentUser && product.status === 'available' && !product.owner._id.equals(currentUser._id) && product.type !== 'sell') { %>
+<!-- Contact Modal (sell listings only — untouched) -->
+<% if (currentUser && product.isAvailable && product.type === 'sell' && product.owner && !product.owner._id.equals(currentUser._id)) { %>
 <div id="contact-modal"
      style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
             z-index:999999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);">
-  <div style="display:flex; align-items:center; justify-content:center;
-              width:100%; height:100%; padding:16px; box-sizing:border-box;">
-    <div style="background:#fff; border-radius:16px; padding:24px; max-width:380px;
-                width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative;
-                box-sizing:border-box;">
-
-      <!-- Close X -->
+  <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; padding:16px; box-sizing:border-box;">
+    <div style="background:#fff; border-radius:16px; padding:24px; max-width:380px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative; box-sizing:border-box;">
       <button onclick="closeContactModal()"
-              style="position:absolute; top:12px; right:12px; width:28px; height:28px;
-                     border-radius:50%; background:#f5f5f4; border:none; cursor:pointer;
-                     display:flex; align-items:center; justify-content:center;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2.5"
-             style="width:13px; height:13px;">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
+              style="position:absolute; top:12px; right:12px; width:28px; height:28px; border-radius:50%; background:#f5f5f4; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2.5" style="width:13px; height:13px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
-
-      <h3 style="font-size:16px; font-weight:600; color:#1c1917; margin:0 0 4px;">
-        Contact Seller
-      </h3>
-      <p style="font-size:13px; color:#78716c; margin:0 0 16px;">
-        Reach out to <strong style="color:#292524;"><%= product.owner.username %></strong> about this listing
-      </p>
-
-      <!-- Listing pill -->
-      <div style="background:#fdf6ee; border:1px solid #f4d4a8; border-radius:10px;
-                  padding:10px 14px; margin-bottom:16px; font-size:12px; color:#92400e;">
-        📦 "<%= product.title %>"
-        — <%= product.type === 'rent' ? 'Rental' : 'Purchase' %> listing
+      <h3 style="font-size:16px; font-weight:600; color:#1c1917; margin:0 0 4px;">Contact Seller</h3>
+      <p style="font-size:13px; color:#78716c; margin:0 0 16px;">Reach out to <strong style="color:#292524;"><%= product.owner.username %></strong> about this listing</p>
+      <div style="background:#fdf6ee; border:1px solid #f4d4a8; border-radius:10px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#92400e;">
+        📦 "<%= product.title %>" — Sale listing
       </div>
-
-      <!-- Email Button -->
       <a href="mailto:<%= product.owner.email %>?subject=Enquiry about <%= product.title %>&body=Hi <%= product.owner.username %>,%0A%0AI'm interested in your listing '<%= product.title %>' on Home Harmony.%0A%0APlease let me know if it's still available.%0A%0AThanks"
-         style="display:flex; align-items:center; justify-content:center; gap:8px;
-                width:100%; background:#dc7420; color:#fff; font-weight:600;
-                padding:12px; border-radius:12px; text-decoration:none;
-                font-size:14px; margin-bottom:8px; box-sizing:border-box;"
-         onmouseover="this.style.background='#ce5c18'"
-         onmouseout="this.style.background='#dc7420'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
-             style="width:16px; height:16px; flex-shrink:0;">
-          <rect x="2" y="4" width="20" height="16" rx="2"/>
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+         style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; background:#dc7420; color:#fff; font-weight:600; padding:12px; border-radius:12px; text-decoration:none; font-size:14px; margin-bottom:8px; box-sizing:border-box;"
+         onmouseover="this.style.background='#ce5c18'" onmouseout="this.style.background='#dc7420'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:16px;height:16px;flex-shrink:0;">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
         </svg>
         Send Email to Seller
       </a>
-
-      <button onclick="closeContactModal()"
-              style="width:100%; padding:10px; background:none; border:none;
-                     font-size:13px; color:#a8a29e; cursor:pointer;">
-        Cancel
-      </button>
+      <button onclick="closeContactModal()" style="width:100%; padding:10px; background:none; border:none; font-size:13px; color:#a8a29e; cursor:pointer;">Cancel</button>
     </div>
   </div>
 </div>
-
 <script>
-  function showContactModal() {
-    document.getElementById('contact-modal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  function closeContactModal() {
-    document.getElementById('contact-modal').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  document.getElementById('contact-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeContactModal();
-  });
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeContactModal();
-  });
+  function showContactModal() { document.getElementById('contact-modal').style.display='flex'; document.body.style.overflow='hidden'; }
+  function closeContactModal() { document.getElementById('contact-modal').style.display='none'; document.body.style.overflow=''; }
+  document.getElementById('contact-modal').addEventListener('click', function(e){ if(e.target===this)closeContactModal(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape')closeContactModal(); });
 </script>
 <% } %>
 
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--  Delete Confirmation Modal                                                 -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Delete Confirmation Modal (untouched) -->
 <div id="delete-modal"
      style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
             z-index:999999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);">
-  <div style="display:flex; align-items:center; justify-content:center;
-              width:100%; height:100%; padding:16px; box-sizing:border-box;">
-    <div style="background:#fff; border-radius:16px; padding:28px; max-width:380px;
-                width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative;
-                box-sizing:border-box; text-align:center;">
-
-      <!-- Red warning icon -->
-      <div style="width:52px; height:52px; background:#fef2f2; border-radius:50%;
-                  display:flex; align-items:center; justify-content:center;
-                  margin:0 auto 16px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"
-             style="width:24px; height:24px;">
-          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
-          <path d="M10 11v6M14 11v6"/>
+  <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; padding:16px; box-sizing:border-box;">
+    <div style="background:#fff; border-radius:16px; padding:28px; max-width:380px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.3); position:relative; box-sizing:border-box; text-align:center;">
+      <div style="width:52px; height:52px; background:#fef2f2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="width:24px;height:24px;">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
         </svg>
       </div>
-
-      <!-- Title -->
-      <h3 style="font-size:17px; font-weight:700; color:#1c1917; margin:0 0 8px;">
-        Delete this listing?
-      </h3>
+      <h3 style="font-size:17px; font-weight:700; color:#1c1917; margin:0 0 8px;">Delete this listing?</h3>
       <p style="font-size:13px; color:#78716c; margin:0 0 24px; line-height:1.6;">
-        This will permanently remove <strong style="color:#292524;">"<%= product.title %>"</strong>
-        and all its images. This action cannot be undone.
+        This will permanently remove <strong style="color:#292524;">"<%= product.title %>"</strong> and all its images. This action cannot be undone.
       </p>
-
-      <!-- Buttons -->
       <div style="display:flex; gap:10px;">
         <button onclick="closeDeleteModal()"
-                style="flex:1; padding:11px; border-radius:12px; border:1.5px solid #e7e5e4;
-                       background:#fff; font-size:14px; font-weight:500; color:#78716c;
-                       cursor:pointer; transition:background 0.15s;"
-                onmouseover="this.style.background='#f5f5f4'"
-                onmouseout="this.style.background='#fff'">
-          Cancel
-        </button>
+                style="flex:1; padding:11px; border-radius:12px; border:1.5px solid #e7e5e4; background:#fff; font-size:14px; font-weight:500; color:#78716c; cursor:pointer;"
+                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='#fff'">Cancel</button>
         <button onclick="confirmDelete()"
-                style="flex:1; padding:11px; border-radius:12px; border:none;
-                       background:#ef4444; font-size:14px; font-weight:600; color:#fff;
-                       cursor:pointer; transition:background 0.15s;"
-                onmouseover="this.style.background='#dc2626'"
-                onmouseout="this.style.background='#ef4444'">
-          Yes, Delete
-        </button>
+                style="flex:1; padding:11px; border-radius:12px; border:none; background:#ef4444; font-size:14px; font-weight:600; color:#fff; cursor:pointer;"
+                onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">Yes, Delete</button>
       </div>
     </div>
   </div>
 </div>
-
 <script>
-  function showDeleteModal() {
-    document.getElementById('delete-modal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDeleteModal() {
-    document.getElementById('delete-modal').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  function confirmDelete() {
-    document.getElementById('delete-listing-form').submit();
-  }
-  document.getElementById('delete-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteModal();
-  });
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeDeleteModal();
-  });
+  function showDeleteModal() { document.getElementById('delete-modal').style.display='flex'; document.body.style.overflow='hidden'; }
+  function closeDeleteModal() { document.getElementById('delete-modal').style.display='none'; document.body.style.overflow=''; }
+  function confirmDelete() { document.getElementById('delete-listing-form').submit(); }
+  document.getElementById('delete-modal').addEventListener('click', function(e){ if(e.target===this)closeDeleteModal(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeDeleteModal(); closeContactModal && closeContactModal(); }});
 </script>

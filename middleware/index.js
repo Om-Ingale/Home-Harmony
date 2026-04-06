@@ -1,12 +1,10 @@
 // middleware/index.js
 
-const Product      = require("../models/Product");
-const Review       = require("../models/Review");
+const Product = require("../models/Product");
+const Review = require("../models/Review");
 const ExpressError = require("../utils/ExpressError");
 
-// ─── isLoggedIn ───────────────────────────────────────────────────────────────
-// Protects any route that requires authentication.
-// Saves the originally requested URL so we can redirect back after login.
+// ── isLoggedIn ────────────────────────────────────────────────────────────────
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   req.session.returnTo = req.originalUrl;
@@ -14,9 +12,7 @@ const isLoggedIn = (req, res, next) => {
   res.redirect("/auth/login");
 };
 
-// ─── storeReturnTo ────────────────────────────────────────────────────────────
-// Passport clears req.session on login; this middleware copies returnTo
-// into res.locals BEFORE passport.authenticate() runs, so we can still use it.
+// ── storeReturnTo ─────────────────────────────────────────────────────────────
 const storeReturnTo = (req, res, next) => {
   if (req.session.returnTo) {
     res.locals.returnTo = req.session.returnTo;
@@ -24,8 +20,16 @@ const storeReturnTo = (req, res, next) => {
   next();
 };
 
-// ─── isOwner ──────────────────────────────────────────────────────────────────
-// Ensures only the product owner can edit or delete a listing.
+// ── isAdmin ───────────────────────────────────────────────────────────────────
+const isAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.role === "admin") return next();
+  req.flash("error", "You must be an admin to access this page.");
+  res.redirect("/");
+};
+
+// ── isOwner ───────────────────────────────────────────────────────────────────
+// Platform products (rent/buy) → admin only
+// User products (sell) → owner only
 const isOwner = async (req, res, next) => {
   const { id } = req.params;
   const product = await Product.findById(id);
@@ -33,15 +37,25 @@ const isOwner = async (req, res, next) => {
     req.flash("error", "Product not found.");
     return res.redirect("/products");
   }
-  if (!product.owner.equals(req.user._id)) {
+
+  // Platform products can only be managed by admin
+  if (product.ownerType === "platform") {
+    if (req.user.role !== "admin") {
+      req.flash("error", "Only admins can modify platform listings.");
+      return res.redirect(`/products/${id}`);
+    }
+    return next();
+  }
+
+  // User sell listings — must be owner
+  if (!product.owner || !product.owner.equals(req.user._id)) {
     req.flash("error", "You do not have permission to do that.");
     return res.redirect(`/products/${id}`);
   }
   next();
 };
 
-// ─── isReviewAuthor ───────────────────────────────────────────────────────────
-// Ensures only the review author can delete their own review.
+// ── isReviewAuthor ────────────────────────────────────────────────────────────
 const isReviewAuthor = async (req, res, next) => {
   const { id, reviewId } = req.params;
   const review = await Review.findById(reviewId);
@@ -56,13 +70,4 @@ const isReviewAuthor = async (req, res, next) => {
   next();
 };
 
-// Add to middleware/index.js
-
-const isAdmin = (req, res, next) => {
-  if (req.isAuthenticated() && req.user.role === "admin") return next();
-  req.flash("error", "You must be an admin to access this page.");
-  res.redirect("/");
-};
-
-// Add isAdmin to exports
 module.exports = { isLoggedIn, storeReturnTo, isOwner, isReviewAuthor, isAdmin };

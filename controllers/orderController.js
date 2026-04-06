@@ -1,22 +1,33 @@
+// controllers/orderController.js
+
 const Order   = require("../models/Order");
 const Product = require("../models/Product");
 const Address = require("../models/Address");
-const User    = require("../models/User");
 const { generateReceipt }        = require("../utils/pdfReceipt");
 const { sendOrderConfirmation, sendSellerNotification } = require("../utils/mailer");
 
-// ── GET /orders/checkout/:productId ──────────────────────────────────────────
+// ── GET /orders/checkout/:productId ───────────────────────────────────────────
 const renderCheckout = async (req, res) => {
-  const product   = await Product.findById(req.params.productId).populate("owner");
+  const product = await Product.findById(req.params.productId).populate("owner");
   if (!product) {
     req.flash("error", "Listing not found.");
     return res.redirect("/products");
   }
-  if (product.status !== "available") {
-    req.flash("error", "This listing is no longer available.");
+
+  // Availability check
+  if (!product.isAvailable) {
+    req.flash("error", "This listing is currently unavailable.");
     return res.redirect(`/products/${product._id}`);
   }
-  if (product.owner._id.equals(req.user._id)) {
+
+  // Stock check for rent/buy
+  if ((product.type === "rent" || product.type === "buy") && product.availableStock <= 0) {
+    req.flash("error", "This item is out of stock.");
+    return res.redirect(`/products/${product._id}`);
+  }
+
+  // Block owner from ordering own sell listing
+  if (product.ownerType === "user" && product.owner?._id.equals(req.user._id)) {
     req.flash("error", "You cannot order your own listing.");
     return res.redirect(`/products/${product._id}`);
   }
@@ -57,8 +68,8 @@ const showOrder = async (req, res) => {
     return res.redirect("/orders/my-orders");
   }
 
-  // Only buyer or seller can view
-  if (!order.buyer._id.equals(req.user._id) && !order.seller._id.equals(req.user._id)) {
+  // Only buyer (or admin) can view
+  if (!order.buyer._id.equals(req.user._id) && req.user.role !== "admin") {
     req.flash("error", "Access denied.");
     return res.redirect("/orders/my-orders");
   }

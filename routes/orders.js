@@ -33,7 +33,25 @@ router.patch("/:id/cancel", isLoggedIn, catchAsync(async (req, res) => {
     order.status = "cancelled";
     await order.save();
 
-    await Product.findByIdAndUpdate(order.product._id, { status: "available" });
+    // ── Restore stock on cancellation ─────────────────────────────────────────
+    if (order.product) {
+        const product = await Product.findById(order.product._id || order.product);
+        if (product) {
+            if (product.type === "rent" || product.type === "buy") {
+                product.availableStock = Math.min(
+                    (product.availableStock || 0) + 1,
+                    product.stock || Infinity
+                );
+                product.isAvailable = true;
+                if (product.availableStock > 0) product.status = "available";
+            } else {
+                // sell listing — restore
+                product.isAvailable = true;
+                product.status = "available";
+            }
+            await product.save();
+        }
+    }
 
     req.flash("success", "Order cancelled successfully. 🚫");
     res.redirect(`/orders/${order._id}`);

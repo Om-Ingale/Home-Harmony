@@ -1,3 +1,5 @@
+// models/Order.js
+
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
@@ -7,10 +9,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // seller is null for platform products (rent/buy) — stored in snapshot
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,
@@ -28,23 +31,34 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ── Rent only ─────────────────────────────────────────────
-    startDate:  { type: Date },
-    endDate:    { type: Date },
-    totalDays:  { type: Number },
+    // ── Phase 8: Snapshot fields (safe even if user/product deleted) ───────
+    userDetails: {
+      name: { type: String },
+      email: { type: String },
+    },
+    productDetails: {
+      title: { type: String },
+      price: { type: Number },
+      type: { type: String },
+    },
 
-    // ── Pricing ───────────────────────────────────────────────
+    // ── Rent only ──────────────────────────────────────────────────────────
+    startDate: { type: Date },
+    endDate: { type: Date },
+    totalDays: { type: Number },
+
+    // ── Pricing ────────────────────────────────────────────────────────────
     totalAmount: { type: Number, required: true },
 
-    // ── Status ────────────────────────────────────────────────
+    // ── Status ────────────────────────────────────────────────────────────
     status: {
       type: String,
       enum: ["pending", "confirmed", "in_transit", "delivered", "cancelled"],
       default: "pending",
     },
 
-    // ── Razorpay ──────────────────────────────────────────────
-    paymentId:       { type: String },
+    // ── Razorpay ──────────────────────────────────────────────────────────
+    paymentId: { type: String },
     razorpayOrderId: { type: String },
   },
   { timestamps: true }

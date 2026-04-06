@@ -21,6 +21,7 @@ const User = require("./models/User");
 const ExpressError = require("./utils/ExpressError");
 
 const authRoutes = require("./routes/auth");
+const profileRoutes = require("./routes/profile");       // ← Phase 8
 const productRoutes = require("./routes/products");
 const reviewRoutes = require("./routes/reviews");
 const paymentRoutes = require("./routes/payment");
@@ -32,14 +33,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/home-harmony";
 
-// ─── Database Connection ──────────────────────
+// ─── Database ─────────────────────────────────
 mongoose
   .connect(DB_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ─── View Engine ──────────────────────────────
-app.engine("ejs", ejsMate);               // use ejs-mate as layout engine
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -49,35 +50,30 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// ─── Session Configuration ────────────────────
+// ─── Session ──────────────────────────────────
 const sessionConfig = {
-  store: MongoStore.create({
-    mongoUrl: DB_URL,
-    touchAfter: 24 * 3600,              // lazy session update (seconds)
-  }),
-  name: "hh_session",                   // custom cookie name (obscures default)
+  store: MongoStore.create({ mongoUrl: DB_URL, touchAfter: 24 * 3600 }),
+  name: "hh_session",
   secret: process.env.SESSION_SECRET || "homeharmony_dev_secret",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,                      // prevent XSS access to cookie
-    // secure: true,                     // uncomment in production (HTTPS only)
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,   // 1 week
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
 };
-
 app.use(session(sessionConfig));
 app.use(flash());
 
-// ─── Passport Initialization ──────────────────
+// ─── Passport ─────────────────────────────────
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// ─── Global Template Variables ────────────────
+// ─── Global Locals ────────────────────────────
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");
@@ -85,16 +81,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Routes ───────────────────────────────────
 app.get("/", (req, res) => {
   res.render("home", { title: "Home Harmony — Rent, Buy & Sell Furniture" });
 });
-
 app.get("/support", (req, res) => {
   res.render("support", { title: "Help & Support — Home Harmony" });
 });
 
 app.use("/auth", authRoutes);
+app.use("/profile", profileRoutes);     // ← Phase 8: GET /profile/edit, PUT /profile
 app.use("/products", productRoutes);
 app.use("/products", reviewRoutes);
 app.use("/payment", paymentRoutes);
@@ -102,30 +98,18 @@ app.use("/admin", adminRoutes);
 app.use("/orders", orderRoutes);
 app.use("/address", addressRoutes);
 
-// TEMP — test email route (remove after testing)
-app.get("/test-email", async (req, res) => {
-  try {
-    const { sendOtpEmail } = require("./utils/mailer");
-    await sendOtpEmail("omingale11042006@gmail.com", "123456");
-    res.send("✅ Test email sent! Check your inbox.");
-  } catch (e) {
-    res.send("❌ Email failed: " + e.message);
-  }
-});
-
-// ─── 404 Handler ─────────────────────────────
+// ─── 404 ──────────────────────────────────────
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
 });
 
-// ─── Global Error Handler ─────────────────────
+// ─── Error Handler ────────────────────────────
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong" } = err;
   res.status(statusCode).render("error", { title: "Error", statusCode, message });
 });
 
-// ─── Start Server ─────────────────────────────
+// ─── Start ────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`🚀 Home Harmony running at http://localhost:${PORT}`);
 });
-

@@ -2,16 +2,15 @@
 
 const User = require("../models/User");
 
-// ── GET /auth/register ────────────────────────
+// ── GET /auth/register ────────────────────────────────────────────────────────
 const renderRegister = (req, res) => {
   res.render("auth/register", { title: "Create Account — Home Harmony" });
 };
 
-// ── POST /auth/register ───────────────────────
-const register = async (req, res) => {
+// ── POST /auth/register ───────────────────────────────────────────────────────
+const register = async (req, res, next) => {
   const { username, email, phone, password } = req.body;
 
-  // Check if email is already taken (passport-local-mongoose only checks username)
   const existingEmail = await User.findOne({ email });
   if (existingEmail) {
     req.flash("error", "An account with that email already exists.");
@@ -19,11 +18,8 @@ const register = async (req, res) => {
   }
 
   const newUser = new User({ username, email, phone });
-
-  // passport-local-mongoose .register() hashes password and saves the user
   const registeredUser = await User.register(newUser, password);
 
-  // Auto-login after registration
   req.login(registeredUser, (err) => {
     if (err) return next(err);
     req.flash("success", `Welcome to Home Harmony, ${registeredUser.username}! 🏠`);
@@ -31,13 +27,12 @@ const register = async (req, res) => {
   });
 };
 
-// ── GET /auth/login ───────────────────────────
+// ── GET /auth/login ───────────────────────────────────────────────────────────
 const renderLogin = (req, res) => {
   res.render("auth/login", { title: "Sign In — Home Harmony" });
 };
 
-// ── POST /auth/login ──────────────────────────
-// passport.authenticate() runs before this; this only handles post-auth redirect.
+// ── POST /auth/login ──────────────────────────────────────────────────────────
 const login = (req, res) => {
   req.flash("success", `Welcome back, ${req.user.username}! 👋`);
   const redirectUrl = res.locals.returnTo || "/products";
@@ -45,7 +40,7 @@ const login = (req, res) => {
   res.redirect(redirectUrl);
 };
 
-// ── POST /auth/logout ─────────────────────────
+// ── POST /auth/logout ─────────────────────────────────────────────────────────
 const logout = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
@@ -54,4 +49,51 @@ const logout = (req, res, next) => {
   });
 };
 
-module.exports = { renderRegister, register, renderLogin, login, logout };
+// ── GET /profile/edit ─────────────────────────────────────────────────────────
+const renderProfileEdit = (req, res) => {
+  res.render("users/edit", {
+    title: "Edit Profile — Home Harmony",
+    user: req.user,
+  });
+};
+
+// ── PUT /profile ──────────────────────────────────────────────────────────────
+const updateProfile = async (req, res) => {
+  const { username, email, phone } = req.body;
+
+  // Basic validation
+  if (!username || !username.trim()) {
+    req.flash("error", "Username is required.");
+    return res.redirect("/profile/edit");
+  }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    req.flash("error", "A valid email is required.");
+    return res.redirect("/profile/edit");
+  }
+
+  // Check email uniqueness (exclude current user)
+  const emailTaken = await User.findOne({ email: email.toLowerCase(), _id: { $ne: req.user._id } });
+  if (emailTaken) {
+    req.flash("error", "That email is already in use.");
+    return res.redirect("/profile/edit");
+  }
+
+  // Check username uniqueness (exclude current user)
+  const usernameTaken = await User.findOne({ username: username.trim(), _id: { $ne: req.user._id } });
+  if (usernameTaken) {
+    req.flash("error", "That username is already taken.");
+    return res.redirect("/profile/edit");
+  }
+
+  // Never allow role update via this route
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { username: username.trim(), email: email.toLowerCase().trim(), phone: phone?.trim() || "" },
+    { new: true, runValidators: true }
+  );
+
+  req.flash("success", "Profile updated successfully! ✅");
+  res.redirect("/profile/edit");
+};
+
+module.exports = { renderRegister, register, renderLogin, login, logout, renderProfileEdit, updateProfile };
