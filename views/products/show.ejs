@@ -270,12 +270,12 @@
           <p class="text-sm text-stone-400 mb-0.5">Price</p>
           <p class="text-3xl font-display font-bold text-stone-900">
             ₹<%= product.price.toLocaleString('en-IN') %>
-            <% if (product.type === 'rent') { %>
-              <span class="text-base font-normal text-stone-400">/ month</span>
+            <% if (product.type === 'Buy') { %>
+              <span class="text-base font-normal text-stone-400"> </span>
             <% } %>
           </p>
           <% if (product.type === 'rent' && product.rentPerMonth) { %>
-            <p class="text-sm text-stone-500 mt-1">Monthly rent: ₹<%= product.rentPerMonth.toLocaleString('en-IN') %></p>
+            <p class="text-base text-stone-500 mt-1">Monthly rent: ₹<%= product.rentPerMonth.toLocaleString('en-IN') %></p>
           <% } %>
         </div>
 
