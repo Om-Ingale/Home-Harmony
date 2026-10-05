@@ -724,6 +724,19 @@
         prefill:     { name: USER_NAME, email: USER_EMAIL },
         theme:       { color: '#dc7420' },
 
+        config: {
+  display: {
+    blocks: {
+      upi: {
+        name: "Pay via UPI",
+        instruments: [{ method: "upi" }]
+      }
+    },
+    sequence: ["block.upi"],
+    preferences: { show_default_blocks: true }
+  }
+},
+
         handler: async function(response) {
           const verify = await fetch('/payment/verify', {
             method:  'POST',
